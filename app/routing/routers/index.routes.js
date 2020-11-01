@@ -51,6 +51,10 @@ const index = {
         // Placeholder for auth dashboard. You'd replace this with
         // your own route protected by 'middleware::auth:UserOnly'
         '/dash': [ 'controller::Home.welcome' ],
+
+        '/api/list-all-teams': [
+            'controller::Teams.list_all_teams'
+        ],
     },
 
     /*
@@ -61,7 +65,9 @@ const index = {
      * or middleware that are applied in order.
      */
     post: {
-
+        '/api/create-team': [
+            'controller::Teams.create_team'
+        ],
     },
 
     // You can include other HTTP verbs here.
