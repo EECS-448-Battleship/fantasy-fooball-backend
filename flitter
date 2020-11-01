@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+/*
+ * ./flitter
+ * -------------------------------------------------------------
+ * The ./flitter command is used to interact with Flitter and its tools
+ * in the development environment. Currently, it lends access to Flitter
+ * shell, which is like a Node interactive prompt, but it's launched from
+ * within the same context as the Flitter HTTP server, allowing developers
+ * to interact with Flitter directly.
+ */
+const CliAppUnit = require('flitter-cli/CliAppUnit')
+const units = require('./Units.flitter')
+
+/*
+ * Replace the HTTP server application target with the CLI handler.
+ */
+units.App = CliAppUnit
+
+const { FlitterApp, RunLevelErrorHandler } = require('libflitter')
+const flitter = new FlitterApp(units)
+const rleh = new RunLevelErrorHandler()
+
+flitter.run().catch(rleh.handle) // calls up() and down()

@@ -1,0 +1,9 @@
+extends error
+
+block head
+    title I'm a Teapot | #{_app ? _app.name : 'Flitter'}
+
+block message
+    p.flitter-name
+        a(href='https://en.wikipedia.org/wiki/HTTP_418') 418: I'm a Teapot
+    p.flitter-name Thank you for using Flitter. How'd you get here, anyway?

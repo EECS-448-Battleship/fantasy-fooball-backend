@@ -1,0 +1,46 @@
+html
+    head
+        title #{T('welcome')} | #{_app.name}
+        style(type="text/css").
+            @import url('https://fonts.googleapis.com/css?family=Rajdhani');
+            html,
+            body {
+                height: 100%;
+                overflow-y: hidden;
+                background-color: #c7dbdf;
+            }
+
+            .flitter-container {
+                height: 60%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .flitter-image {
+                height: 150px;
+            }
+
+            .flitter-name {
+                font-family: "Rajdhani";
+                font-size: 50pt;
+                margin-left: 35px;
+                color: #00323d;
+                text-decoration: none;
+            }
+
+            .flitter-text {
+                font-family: "Rajdhani";
+                font-size: 24pt;
+                color: #00323d;
+            }
+body
+    .flitter-container
+        img.flitter-image(src="/assets/flitter.png")
+        a.flitter-name(href="https://flitter.garrettmills.dev/" target="_blank") #{T('powered_by_flitter')}
+    if user
+        .flitter-container
+            p.flitter-text #{T('welcome')}, #{user.uid}! <a href="/auth/logout">#{T('log_out')}</a>
+    else
+        .flitter-container
+            p.flitter-text #{T('new_to_flitter')} <a href="https://flitter.garrettmills.dev/" target="_blank">#{T('start_here')}</a>

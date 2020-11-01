@@ -1,0 +1,47 @@
+html
+    head
+        title Uh-Oh! | #{_app ? _app.name : 'Flitter'}
+        style(type="text/css").
+            @import url('https://fonts.googleapis.com/css?family=Rajdhani');
+            @import url('https://fonts.googleapis.com/css?family=Oxygen+Mono');
+            html,
+            body {
+                background-color: #c7dbdf;
+                font-family: "Rajdhani",sans-serif;
+                padding-left: 2%;
+                padding-top: 2%;
+            }
+            p {
+                font-family: "Oxygen Mono",sans-serif;
+                font-size: 14pt;
+            }
+body
+    h1 Error: #{error ? error.message : (message ? message : 'An unknown error has occurred.')}
+    h3 Status: #{error ? error.status : (status ? status : 500)}
+    h4#errmsg
+    if error
+        p !{error.stack.replace(/\n/g, '<br>')}
+    
+    script.
+        const errors = [
+            'Insert your Windows installation disc and restart your computer.',
+            'I am a teapot.',
+            'Printing not supported on this printer.',
+            'Keyboard not found. Press F1 to continue.',
+            'Bailing out. You\'re on your own. Good luck.',
+            'A team of highly trained monkeys is on its way.',
+            'Well.... something happened.',
+            'Beats the hell out of me, but something went wrong.',
+            'Yeaaaaah... if you could, like, not, that\'d be great.',
+            'I\'m fine. Everything is fine.',
+            'Blocked by Windows Parental Controls.',
+            'This is not the bug you\'re looking for.',
+            'Houston, we have a problem.',
+            'I don\'t think we\'re in Kansas anymore...',
+            'Please enable ActiveX to continue. ;)',
+            'Your PC ran into a wall.',
+            'Are you on drugs?',
+            'Error: Success',
+        ]
+
+        document.getElementById('errmsg').innerHTML = errors[Math.floor(Math.random()*errors.length)]

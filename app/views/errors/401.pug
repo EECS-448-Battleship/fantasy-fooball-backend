@@ -1,0 +1,7 @@
+extends error
+
+block head
+    title Access Denied | #{_app ? _app.name : 'Flitter'}
+
+block message
+    p.flitter-name 401: Access Denied

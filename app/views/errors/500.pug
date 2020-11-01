@@ -1,0 +1,7 @@
+extends error
+
+block head
+    title Internal Server Error | #{_app ? _app.name : 'Flitter'}
+
+block message
+    p.flitter-name 500: Internal Server Error

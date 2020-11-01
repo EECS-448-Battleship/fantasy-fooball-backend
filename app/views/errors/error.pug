@@ -1,0 +1,33 @@
+html
+    head
+        block head
+        style(type="text/css").
+            @import url('https://fonts.googleapis.com/css?family=Rajdhani');
+            html,
+            body {
+                height: 100%;
+                overflow-y: hidden;
+                background-color: #c7dbdf;
+            }
+
+            .flitter-container {
+                height: 60%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .flitter-image {
+                height: 150px;
+            }
+
+            .flitter-name {
+                font-family: "Rajdhani";
+                font-size: 50pt;
+                margin-left: 35px;
+                color: #00323d;
+            }
+body
+    .flitter-container
+        img.flitter-image(src="/assets/flitter.png")
+        block message

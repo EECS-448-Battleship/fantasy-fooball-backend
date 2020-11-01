@@ -1,0 +1,7 @@
+extends error
+
+block head
+    title Bad Request | #{_app ? _app.name : 'Flitter'}
+
+block message
+    p.flitter-name 400: Bad Request

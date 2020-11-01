@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1555000000,
+    "name": "create_flaps_json_file",
+    "migratedOn": "2019-04-12T17:26:34.522Z"
+  },
+  {
+    "id": 1555611659,
+    "name": "move_views_dir_inside_app_dir",
+    "migratedOn": "2019-04-18T19:24:16.741Z"
+  },
+  {
+    "id": 1556469759,
+    "name": "create_docker_env_file",
+    "migratedOn": "2019-04-28T16:49:11.238Z"
+  },
+  {
+    "id": 1560988609,
+    "name": "move_database_unit_before_express_unit",
+    "migratedOn": "2019-06-21T00:31:38.019Z"
+  },
+  {
+    "id": 1565741502,
+    "name": "convert_to_new_model_schema_definitions",
+    "migratedOn": "2019-08-16T01:22:01.971Z"
+  },
+  {
+    "id": 1565925593,
+    "name": "make_existing_middleware_extend_base_class",
+    "migratedOn": "2019-08-18T16:07:56.112Z"
+  },
+  {
+    "id": 1566420176,
+    "name": "add_ssl_to_server_config",
+    "migratedOn": "2019-08-21T21:30:49.802Z"
+  }
+]
