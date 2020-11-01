@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/TopLevel.component.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/TopLevel.component.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {Component} from '../../lib/vues6.js'
+import {router} from '../module/routing.js'
+
+const template = `
+&lt;div class="top-level-container">
+    &lt;div class="navbar-container">
+        &lt;h1 class="title">Fantasy Football&lt;/h1>
+        &lt;ul class="navbar">
+            &lt;li class="navbar-item" v-for="item of navbar_items" :class="{ active: current_route === item.page }">
+                &lt;app-link :href="item.page" :text="item.title">&lt;/app-link>
+            &lt;/li>
+            
+            &lt;li class="navbar-item">
+                &lt;a href="#" @click="on_refresh($event)">Refresh&lt;/a>
+            &lt;/li>
+        &lt;/ul>
+    &lt;/div>
+    &lt;div class="page-container">
+        &lt;page-my-team v-if="current_route === 'my-team'">&lt;/page-my-team>
+        &lt;page-add-players v-if="current_route === 'my-team/add-players'">&lt;/page-add-players>
+        &lt;page-scores v-if="current_route === 'scores'">&lt;/page-scores>
+        &lt;page-league v-if="current_route === 'league'">&lt;/page-league>
+        &lt;page-draft-board v-if="current_route === 'draft-board'">&lt;/page-draft-board>
+    &lt;/div>
+&lt;/div>
+`
+
+/**
+ * Top-level component which manages the display of the entire game.
+ * @extends Component
+ */
+class TopLevelComponent extends Component {
+    static get selector() { return 'app-top-level' }
+    static get template() { return template }
+    static get props() { return [] }
+
+    /**
+     * The currently loaded page route.
+     * @type {string}
+     */
+    current_route = ''
+
+    /**
+     * Array of navigation bar items where "title" is the page name, and "page" is the page route.
+     * @type {Array&lt;object>}
+     */
+    navbar_items = [
+        { title: 'My Team', page: 'my-team' },
+        { title: 'Add Players', page: 'my-team/add-players' },
+        { title: 'Scores', page: 'scores' },
+        { title: 'League', page: 'league' },
+        { title: 'Draft Board', page: 'draft-board' },
+    ]
+
+    /**
+     * Called when the component is initialized.
+     * @return {Promise&lt;void>}
+     */
+    async vue_on_create() {
+        // Listen for navigation changes.
+        this.router_subscription = router.subscribe((path, args) => this.on_route_change(path, args))
+
+        if ( !this.current_route ) {
+            router.navigate('my-team')
+        }
+
+        const url_params = new URLSearchParams(window.location.search)
+        if ( url_params.has('then') ) {
+            const route = url_params.get('then')
+            router.navigate(route)
+        }
+    }
+
+    /**
+     * Called when the component is destroyed.
+     * @return {Promise&lt;void>}
+     */
+    async vue_on_destroy() {
+        // Stop listening for navigation changes.
+        this.router_subscription.unsubscribe()
+    }
+
+    /**
+     * Called when the navigation changes.
+     * @param {string} path
+     * @param {*} args
+     * @return {Promise&lt;void>}
+     */
+    async on_route_change(path, args) {
+        if ( path.startsWith('/') ) path = path.slice(1)
+        if ( path.endsWith('/') ) path = path.slice(0, -1)
+
+        this.current_route = path
+    }
+
+    on_refresh($event) {
+        window.location.href = `/?then=${this.current_route}`
+    }
+}
+
+export default TopLevelComponent
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-routing.html">routing</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="AddPlayersComponent.html">AddPlayersComponent</a></li><li><a href="DraftBoardComponent.html">DraftBoardComponent</a></li><li><a href="GridActionButtonComponent.html">GridActionButtonComponent</a></li><li><a href="GridComponent.html">GridComponent</a></li><li><a href="LeagueComponent.html">LeagueComponent</a></li><li><a href="LinkComponent.html">LinkComponent</a></li><li><a href="module-routing-Router.html">Router</a></li><li><a href="MyTeamComponent.html">MyTeamComponent</a></li><li><a href="ScoresComponent.html">ScoresComponent</a></li><li><a href="TopLevelComponent.html">TopLevelComponent</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GridCellRenderType">GridCellRenderType</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Sun Oct 25 2020 12:32:18 GMT-0500 (Central Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

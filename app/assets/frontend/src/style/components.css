@@ -1,0 +1,260 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap');
+
+body {
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
+:root {
+    --color-text-dark: #022D50;
+    --color-text-light: #FDFFFC;
+    --color-accent-1: #0582CA;
+    --color-accent-2: #00A6FB;
+    --color-accent-3: #CC5746;
+}
+
+#wrapper {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-y: scroll;
+}
+
+.top-level-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/****** NAVIGATION BAR STYLES ******/
+.navbar-container {
+    background: var(--color-text-light);
+    color: var(--color-text-dark);
+    position: fixed;
+    width: 100%;
+}
+
+.navbar-container .title {
+    margin-left: 20px;
+}
+
+.navbar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    color: var(--color-text-light);
+    background: var(--color-text-dark);
+    overflow: hidden;
+}
+
+.navbar .navbar-item {
+    display: inline;
+    float: left;
+    transition: all linear 150ms;
+}
+
+.navbar .navbar-item:hover, .navbar .navbar-item.active {
+    background: var(--color-text-light);
+    color: var(--color-text-dark);
+}
+
+.navbar .navbar-item a {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    padding: 15px;
+}
+
+.page-container {
+    margin-top: 130px;
+}
+
+/******** SHARED GRID STYLES ********/
+.component-app-grid table {
+    width: 100%;
+    border: 1px solid var(--color-text-dark);
+    border-collapse: collapse;
+}
+
+.component-app-grid th, .component-app-grid td {
+    padding: 10px;
+    border: 1px solid var(--color-text-dark);
+    border-collapse: collapse;
+}
+
+div.center {
+    display: table;
+    align-items: center;
+    text-align: center;
+}
+
+div.center img {
+    vertical-align: middle;
+    display: table-cell;
+}
+
+div.center span {
+    padding: 10px;
+    vertical-align: middle;
+    display: table-cell;
+}
+
+#ranking{
+    text-align: center;
+}
+
+#record{
+    text-align: center;
+}
+
+.header {
+    padding-left: 15px;
+    display: flex;
+    flex-direction: row;
+}
+
+.header .left {
+    flex: 1;
+}
+
+.header .right {
+    margin-right: 20px;
+}
+
+.header .right button {
+    margin: 0;
+    margin-top: 25px;
+    border: 1px solid lightgray;
+    padding: 5px 20px;
+}
+
+.header .right button:hover:not(.disable-click) {
+    background: lightgrey;
+    cursor: pointer;
+}
+
+.header .right button.disable-click {
+    background: darkgrey;
+}
+
+/********* ADD PLAYERS PAGE **********/
+.page-add-players {
+    display: flex;
+    flex-direction: column;
+}
+
+.page-add-players .header input {
+    border: 1px solid lightgray;
+    padding: 5px;
+    border-radius: 3px;
+    margin-top: 24px;
+}
+
+.page-add-players .item-grid {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    height: 270px;
+    flex-wrap: wrap;
+}
+
+.page-add-players .item-grid .item {
+    margin: 15px;
+    border: 1px solid darkgrey;
+    border-radius: 5px;
+    padding: 10px;
+    min-width: 180px;
+    min-height: 270px;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-add-players .item-grid .item .item-icon {
+    text-align: center;
+}
+
+.page-add-players .item-grid .item .item-icon img {
+    height: 100px;
+    border-radius: 50%;
+}
+
+.page-add-players .item-grid .item .item-contents h1 {
+    font-size: 1.5em;
+}
+
+.page-add-players .item-grid .item .item-button button {
+    width: 100%;
+    color: white;
+    border-radius: 5px;
+}
+
+.page-add-players .item-grid .item .item-button button.add {
+    border: 1px solid #009900;
+    background: darkgreen;
+}
+
+.page-add-players .item-grid .item .item-button button.add:hover {
+    background: #009900;
+    cursor: pointer;
+}
+
+.page-add-players .item-grid .item .item-button button.remove {
+    border: 1px solid #ff1a1a;
+    background: #cc0000;
+}
+
+.page-add-players .item-grid .item .item-button button.remove:hover {
+    background: #ff1a1a;
+    cursor: pointer;
+}
+
+/************ MY TEAM PAGE **************/
+.page-my-team .header .team-name {
+    display: flex;
+    flex-direction: row;
+}
+
+.page-my-team .header .team-name input {
+    margin-left: 5px;
+    border: none;
+    font-size: 15pt;
+    font-family: 'Roboto Condensed', sans-serif;
+    flex: 1;
+}
+
+/************ League PAGE **************/
+#ranking{
+    text-align: center;
+}
+
+#record{
+    text-align: center;
+}
+
+.page-league .stats {
+    display: flex;
+    flex-direction: row;
+}
+
+.page-league .stats .stat {
+    margin-right: 10px;
+}
+
+.page-league .stats .stat .title {
+    font-weight: bold;
+}
+
+/************ Draft Board PAGE **************/
+.page-draft-board .stats {
+    display: flex;
+    flex-direction: row;
+}
+
+.page-draft-board .stats .stat {
+    margin-right: 10px;
+}
+
+.page-draft-board .stats .stat .title {
+    font-weight: bold;
+}
