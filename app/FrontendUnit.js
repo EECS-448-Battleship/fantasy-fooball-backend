@@ -21,6 +21,10 @@ class FrontendUnit extends Unit {
         app.express.use('/app', [
             this.canon.get('middleware::auth:UserOnly'),
             (req, res, next) => {
+                if ( !req.user ) {
+                    return res.redirect('/auth/login')
+                }
+
                 const allowed_extensions = [
                     '.html', '.js', '.css', '.svg', '.ttf', '.jpg', '.png',
                     '.jpeg', '.webmanifest', '.json', '.eot', '.svg', '.cur',

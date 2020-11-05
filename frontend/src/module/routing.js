@@ -29,7 +29,8 @@ class Router {
     constructor() {
         try {
             const route = location.href.split(APP_BASE_PATH).filter(Boolean)[0].split(/[#?]/)[0]
-            if ( route ) {
+            if ( route && !route.toLowerCase().includes('http://') && !route.toLowerCase().includes('https://') ) {
+                console.log('resume route', route)
                 this.navigate(route, {})
             }
         } catch (e) {}
