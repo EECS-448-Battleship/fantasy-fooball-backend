@@ -20,6 +20,10 @@ const server_config = {
      */
     frontend_path: env('FRONT_END_PATH', 'frontend'),
 
+    sports_data: {
+        api_key: env('SPORTSDATA_API_KEY'),
+    },
+
     logging: {
 
         /*
