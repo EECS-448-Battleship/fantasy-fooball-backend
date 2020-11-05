@@ -8,6 +8,9 @@ const template = `
         <div class="left team-name">
             <h2>My Team - </h2><input placeholder="Click to edit team name..." type="text" v-model="team_name">
         </div>
+        <div class="right">
+            <span class="save-text" style="margin-right: 20px; color: #555555; font-style: italic;">{{ save_text }}</span><button @click="save_changes()">Save</button>
+        </div>
     </div>
     <div class="body" style="display: flex; flex-direction: row; margin-left: 10px; padding-bottom: 50px;" v-if="show_body">
         <app-grid
@@ -49,6 +52,12 @@ class MyTeamComponent extends Component {
      * @type {string}
      */
     team_name = ''
+
+    /**
+     * The text next to the save button.
+     * @type {string}
+     */
+    save_text = 'All changes saved.'
 
     /**
      * If true, the body of the page will be shown. Otherwise, hidden.
@@ -134,6 +143,7 @@ class MyTeamComponent extends Component {
                     }
 
                     this.moving_player = undefined;
+                    this.$_vue_inst.mark_dirty();
                 }
 
                 this.$_vue_inst.update();  // $_vue_inst refers to the Vue.component instance, not the data class.
@@ -200,6 +210,18 @@ class MyTeamComponent extends Component {
         this.$nextTick(() => {
             this.show_body = true;
         });
+    }
+
+    mark_dirty() {
+        this.save_text = 'Unsaved changed'
+    }
+
+    async save_changes() {
+        this.save_text = 'Saving changes...'
+
+        setTimeout(() => {
+            this.save_text = 'All changes saved.'
+        }, 2000)
     }
 }
 
