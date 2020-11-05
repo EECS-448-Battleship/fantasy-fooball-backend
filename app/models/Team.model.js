@@ -50,6 +50,15 @@ class Team extends Model {
         return new_team
     }
 
+    async players() {
+        const Player = this.models.get('Player')
+        return Player.find({
+            _id: {
+                $in: this.player_ids.map(x => Player.to_object_id(x))
+            }
+        })
+    }
+
     async to_api() {
         const User = this.models.get('auth:User')
 

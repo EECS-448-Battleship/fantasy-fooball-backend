@@ -67,11 +67,12 @@ class Player extends Model {
 
     async to_api() {
         return {
-            player_number: this.player_number,
-            player_name: this.player_name,
-            player_position: this.player_position,
-            team_name: this.team_name,
-            image_url: this.image_url,
+            number: this.player_number,
+            name: this.full_name,
+            position: this.fantasy_position,
+            team_name: this.patch_data.patch_team_name,
+            image: this.photo_url,
+            stats: {}, // TODO - populate some stats!
         }
     }
 }

@@ -21,6 +21,13 @@ class Teams extends Controller {
         return res.api(await req.user_team.to_api())
     }
 
+    async get_my_team_players(req, res, next) {
+        const players = await req.user_team.players()
+        console.log(players)
+        console.log(await players[0].to_api())
+        return res.api(await Promise.all(players.map(x => x.to_api())))
+    }
+
     async list_all_teams(req, res) {
         const TeamModel = this.models.get('Team')
         const teams = await TeamModel.find()
