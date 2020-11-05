@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Fantasy Football</title>
+
+        <script>
+            let loc = window.location.href
+            if ( loc.endsWith('index.html') ) loc = loc.slice(0, -('index.html').length)
+            loc = loc.split(/[?#]/)[0]
+            loc = loc.split('/app')[0]
+            if ( !loc.endsWith('/') ) loc = `${loc}/app/`
+
+            window.APP_BASE_PATH = loc
+        </script>
+
+        <link rel="stylesheet" href="/app/src/style/components.css">
+    </head>
+    <body>
+        <!-- This is the container where the Vue.js application will render to. -->
+        <div id="wrapper">
+
+            <!-- The top level component. -->
+            <app-top-level></app-top-level>
+        </div>
+
+        <script src="/app/lib/vue-2.6.11.js"></script>
+        <script src="/app/lib/vues6.js" type="module"></script>
+        <script src="/app/src/module/start.js" type="module"></script>
+    </body>
+</html>

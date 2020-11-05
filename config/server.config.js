@@ -14,6 +14,12 @@ const server_config = {
      */
     environment: env('ENVIRONMENT', 'production'),
 
+    /*
+     * The relative path to the front-end application.
+     * Relative to the repository root.
+     */
+    frontend_path: env('FRONT_END_PATH', 'frontend'),
+
     logging: {
 
         /*

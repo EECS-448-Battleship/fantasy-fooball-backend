@@ -55,6 +55,7 @@ const FlitterUnits = {
     'Forms'         : require('flitter-forms/FormsUnit'),
     'Auth'          : require('flitter-auth/AuthUnit'),
     'Flap'          : require('flitter-flap/FlapUnit'),
+    'FrontEnd'      : require('./app/FrontendUnit'),
 
     /*
      * Custom Flitter Units
