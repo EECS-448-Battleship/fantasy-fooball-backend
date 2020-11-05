@@ -9,10 +9,6 @@ const template = `
             <li class="navbar-item" v-for="item of navbar_items" :class="{ active: current_route === item.page }">
                 <app-link :href="item.page" :text="item.title"></app-link>
             </li>
-            
-            <li class="navbar-item">
-                <a href="#" @click="on_refresh($event)">Refresh</a>
-            </li>
         </ul>
     </div>
     <div class="page-container">
