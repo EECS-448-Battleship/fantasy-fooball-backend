@@ -68,32 +68,7 @@ class MyTeamComponent extends Component {
      * a position, then only the "postition" key will be set.
      * @type {object[]}
      */
-    starting_players = [
-        {
-            position: 'QB',
-        },
-        {
-            position: 'RB',
-        },
-        {
-            position: 'RB',
-        },
-        {
-            position: 'WR',
-        },
-        {
-            position: 'WR',
-        },
-        {
-            position: 'TE',
-        },
-        {
-            position: 'FLX',
-        },
-        {
-            position: 'DST',
-        },
-    ]
+    starting_players = []
 
     /**
      * Players on the bench.
@@ -112,16 +87,16 @@ class MyTeamComponent extends Component {
         },
         {
             header: 'Player',
-            key: 'player_name',
+            key: 'name',
             type: GridCellRenderType.HTML,
             renderer: (_, data) => {
-                if ( !data.player_name ) {
+                if ( !data.name ) {
                     return `<i style="color: darkgrey">none</i>`
                 } else {
                     return `
                         <div class="center">
-                            <img src="${data.image}" alt="${data.player_name}" height="50" style="border-radius: 50%">
-                            <span>${data.player_name}</span>
+                            <img src="${data.image}" alt="${data.name}" height="50" style="border-radius: 50%">
+                            <span>${data.name} (${data.number})</span>
                         </div>
                     `
                 }
@@ -129,7 +104,7 @@ class MyTeamComponent extends Component {
         },
         {
             header: '',
-            key: 'player_name',
+            key: 'name',
             type: GridCellRenderType.Component,
             component: Vue.component('app-action-button'),
             button_color: (row, col) => this.moving_player ? '#CC5746' : '#0582CA',
@@ -137,24 +112,28 @@ class MyTeamComponent extends Component {
                 return this.moving_player ? 'Here' : 'Move'
             },
             button_hidden: (row, col) => {
-                if ( this.moving_player && this.moving_player.player_name !== row.player_name ) return false;
-                if ( !row.player_name ) return true;
-                return this.moving_player && this.moving_player.player_name === row.player_name;
+                if ( this.moving_player && this.moving_player.name !== row.name ) return false;
+                if ( !row.name ) return true;
+                return this.moving_player && this.moving_player.name === row.name;
             },
             on_click: (row, col) => {
                 if ( !this.moving_player ) {
                     this.moving_player = row;
                 } else {
                     const old_row = {...row};
-                    row.player_name = this.moving_player.player_name;
-                    row.ecr = this.moving_player.ecr;
-                    row.image = this.moving_player.image;
+                    const moved_row = {...this.moving_player};
 
-                    this.moving_player.player_name = old_row.player_name;
-                    this.moving_player.ecr = old_row.ecr;
-                    this.moving_player.image = old_row.image;
+                    for ( const prop in moved_row ) {
+                        if ( prop === 'position' ) continue;
+                        row[prop] = moved_row[prop]
+                    }
+
+                    for ( const prop in moved_row ) {
+                        if ( prop === 'position' ) continue;
+                        this.moving_player[prop] = old_row[prop]
+                    }
+
                     this.moving_player = undefined;
-                    console.log(this.moving_player, row);
                 }
 
                 this.$_vue_inst.update();  // $_vue_inst refers to the Vue.component instance, not the data class.
@@ -201,11 +180,11 @@ class MyTeamComponent extends Component {
      */
     async vue_on_create() {
         console.log('api', api)
-        const my_team = await api.get_my_team()
+        const [my_team, lineup] = await Promise.all([api.get_my_team(), api.get_my_team_current_lineup()])
         this.team_name = my_team.team_name
         this.overall_data = await api.get_my_team_players()
-
-        this.bench_players = this.overall_data.map(x => { x = {...x, position: 'B'}; return x })
+        this.bench_players = lineup.benched_players
+        this.starting_players = lineup.starting_players
 
         setTimeout(() => {
             this.update();

@@ -49,6 +49,7 @@ const index = {
 
         '/my-team': ['controller::Teams.get_my_team'],
         '/my-team/players': ['controller::Teams.get_my_team_players'],
+        '/my-team/lineup': ['controller::Teams.get_my_team_current_lineup'],
     },
 
     /*

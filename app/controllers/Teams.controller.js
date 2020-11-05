@@ -21,19 +21,50 @@ class Teams extends Controller {
         return res.api(await req.user_team.to_api())
     }
 
+    /**
+     * Return the API data for the players on the current user's team.
+     * @param req
+     * @param res
+     * @param next
+     * @return {Promise<*>}
+     */
     async get_my_team_players(req, res, next) {
         const players = await req.user_team.players()
-        console.log(players)
-        console.log(await players[0].to_api())
         return res.api(await Promise.all(players.map(x => x.to_api())))
     }
 
+    /**
+     * Return the API data for the current lineup for the current user's team.
+     * @param req
+     * @param res
+     * @param next
+     * @return {Promise<*>}
+     */
+    async get_my_team_current_lineup(req, res, next) {
+        const Lineup = this.models.get('Lineup')
+        const lineup = await Lineup.get_and_update_for_team(req.user_team)
+        return res.api(await lineup.to_api())
+    }
+
+    /**
+     * Return the API data for a list of all teams.
+     * @param req
+     * @param res
+     * @return {Promise<*>}
+     */
     async list_all_teams(req, res) {
         const TeamModel = this.models.get('Team')
         const teams = await TeamModel.find()
         return res.api(teams)
     }
 
+    /**
+     * API endpoint for creating a new team.
+     * @todo remove this - happens automatically per-user
+     * @param req
+     * @param res
+     * @return {Promise<*>}
+     */
     async create_team(req, res) {
         const TeamModel = this.models.get('Team')
 

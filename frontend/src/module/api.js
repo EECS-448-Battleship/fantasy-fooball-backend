@@ -11,6 +11,10 @@ class API {
         return this.get_request('my-team/players')
     }
 
+    async get_my_team_current_lineup() {
+        return this.get_request('my-team/lineup')
+    }
+
     async get_request(...parts) {
         const url = this.build_url(...parts)
         const result = await fetch(url)
