@@ -24,6 +24,6 @@
     "flitter-i18n": "^0.1.0",
     "flitter-orm": "^0.4.0",
     "flitter-upload": "^0.8.1",
-    "libflitter": "^0.53.0"
+    "libflitter": "^0.58.1"
   }
 }

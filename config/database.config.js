@@ -14,14 +14,18 @@ const database_config = {
     /*
      * MongoDB port on the database host.
      */
+    // port: env('DATABASE_PORT', 27017),
     port: env('DATABASE_PORT', 27017),
+
+    protocol: env('DATABASE_PROTOCOL', 'mongodb'),
+    connect_flags: env('DATABASE_FLAGS', '?authSource=admin'),
 
     auth: {
 
         /*
          * Boolean true if the database connection requires auth.
          */
-        require: env('DATABASE_AUTH', false),
+        require: 'true', // env('DATABASE_AUTH', false),
 
         /*
          * MongoDB username and password.
