@@ -1,0 +1,9 @@
+extends ./auth_page
+
+block content
+    h3.login-heading.mb-4 #{heading_text}
+    if errors
+        each error in errors
+            p.form-error-message #{error}
+    form(method='post' enctype='multipart/form-data')
+        block form

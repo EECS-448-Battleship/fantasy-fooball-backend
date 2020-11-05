@@ -9,6 +9,7 @@
  * routes file.
  */
 const Middleware = [
+    "auth:Utility",
 
     // Injects the RequestLocalizationHelper
     "i18n:Localize",

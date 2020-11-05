@@ -1,0 +1,12 @@
+extends ./auth_page
+
+block content
+    h3.login-heading.mb-4 Authorize #{client.name}?
+    h5.login-heading.mb-4 #{client.name} wants to access basic user information about your #{_app.name} account.
+    h5.login-heading.mb-4 After authorization, you may not be prompted again.
+    form(method='post' enctype='multipart/form-data')
+        input(type='hidden' name='redirect_uri' value=uri.toString())
+        input(type='hidden' name='client_id' value=client.clientID)
+        button.btn.btn-lg.btn-primary.btn-block.btn-login.text-uppercase.font-weight-bold.mb-2.form-submit-button(type='submit') Authorize #{client.name}
+    .text-center
+        span.small(style="color: #999999;") Will redirect to: #{uri.host}

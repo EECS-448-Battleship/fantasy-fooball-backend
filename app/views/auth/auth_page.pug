@@ -1,0 +1,16 @@
+html
+    head
+        title #{title} | #{_app.name}
+        meta(name='viewport' content='width=device-width initial-scale=1')
+        link(rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css')
+        link(rel='stylesheet' href='/assets/auth/forms.css')
+    body
+        .container-fluid
+            .row.no-gutter
+                .col-md-12.col-lg-6.offset-lg-3
+                    .login.d-flex.align-items-center.py-5
+                        .container
+                            .row
+                                .col-md-9.col-lg-8.mx-auto
+                                    block content
+        script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css')

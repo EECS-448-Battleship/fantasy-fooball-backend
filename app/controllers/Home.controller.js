@@ -12,16 +12,11 @@ class Home extends Controller {
      * Serve the main welcome page.
      */
     welcome(req, res){
-
-        /*
-         * Return the welcome view.
-         * The page() method is added by Flitter and passes some
-         * helpful contextual data to the view as well.
-         */
-        return res.page('welcome', {
-            user: req.user,
-            T: req.T,
-        })
+        if ( req.user ) {
+            return res.redirect('/app')
+        } else {
+            return res.redirect('/auth/login')
+        }
     }
 }
 

@@ -1,0 +1,16 @@
+extends ./form
+
+block form
+    .form-label-group
+        input#inputUsername.form-control(type='text' name='username' value=(form_data ? form_data.username : '') required placeholder='Username' autofocus)
+        label(for='inputUsername') Username
+    .form-label-group
+        input#inputPassword.form-control(type='password' name='password' required placeholder='Password')
+        label(for='inputPassword') Password
+    button.btn.btn-lg.btn-primary.btn-block.btn-login.text-uppercase.font-weight-bold.mb-2.form-submit-button(type='submit') Register
+    .text-center
+        span.small Already registered?&nbsp;
+            a(href='./login') Log-in here.
+    .text-center
+        span.small(style="color: #999999;") Provider: #{provider_name}
+            
