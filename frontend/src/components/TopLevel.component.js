@@ -59,6 +59,7 @@ class TopLevelComponent extends Component {
     async vue_on_create() {
         // Listen for navigation changes.
         this.router_subscription = router.subscribe((path, args) => this.on_route_change(path, args))
+        this.current_route = router.current_route
 
         const url_params = new URLSearchParams(window.location.search)
         if ( url_params.has('then') ) {

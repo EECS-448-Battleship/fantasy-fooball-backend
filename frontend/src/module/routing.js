@@ -10,6 +10,9 @@ class Router {
      */
     route_args = undefined
 
+    /** The currently navigated route. */
+    current_route = undefined
+
     /**
      * List of callback functions listening for route changes.
      * @type {function[]}
@@ -21,6 +24,17 @@ class Router {
      * @type {object[]}
      */
     history = []
+
+    /** Initialize the router and determine the current page. */
+    constructor() {
+        try {
+            const route = location.href.split(APP_BASE_PATH).filter(Boolean)[0].split(/[#?]/)[0]
+            if ( route ) {
+                this.navigate(route, {})
+            }
+        } catch (e) {}
+    }
+
 
     /**
      * Returns the APP_BASE_PATH of the application.
@@ -39,6 +53,7 @@ class Router {
         this.route_args = args
         this.history.push({path, args})
         window.history.pushState({}, path, this.build_url(path))
+        this.current_route = path
         this.subscribers.forEach(sub => sub(path, args))
     }
 
