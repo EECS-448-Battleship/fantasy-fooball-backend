@@ -1,8 +1,7 @@
 /*
- * Index Routes
+ * API Routes
  * -------------------------------------------------------------
- * This is a sample routes file. Routes and their handlers should be
- * defined here, but no logic should occur.
+ * These routes are related to the AJAX API used by the front-end.
  */
 const index = {
 
@@ -12,7 +11,7 @@ const index = {
      *      '/' becomes '/auth'
      *      '/login' becomes '/auth/login'
      */
-    prefix: '/',
+    prefix: '/api/v1',
 
     /*
      * Define middleware that should be applied to all
@@ -26,8 +25,11 @@ const index = {
      * handler's test() method.
      */
     middleware: [
-        // Sets the locale scope
-        ['i18n:Scope', {scope: 'common'}],
+        // Require an authenticated user
+        'auth:UserOnly',
+
+        // Inject the user's team
+        'InjectUserTeam',
     ],
 
     /*
@@ -45,13 +47,7 @@ const index = {
             'controller::Home.welcome'
         ],
 
-        // Placeholder for auth dashboard. You'd replace this with
-        // your own route protected by 'middleware::auth:UserOnly'
-        '/dash': [ 'controller::Home.welcome' ],
-
-        '/api/list-all-teams': [
-            'controller::Teams.list_all_teams'
-        ],
+        '/my-team': ['controller::Teams.get_my_team'],
     },
 
     /*
@@ -62,9 +58,7 @@ const index = {
      * or middleware that are applied in order.
      */
     post: {
-        '/api/create-team': [
-            'controller::Teams.create_team'
-        ],
+
     },
 
     // You can include other HTTP verbs here.

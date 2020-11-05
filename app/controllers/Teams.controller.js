@@ -9,6 +9,18 @@ class Teams extends Controller {
         return [...super.services, 'models']
     }
 
+    /**
+     * Return the API data for the current user's team.
+     * Requires an authenticated user.
+     * @param req
+     * @param res
+     * @param next
+     * @return {Promise<void>}
+     */
+    async get_my_team(req, res, next) {
+        return res.api(await req.user_team.to_api())
+    }
+
     async list_all_teams(req, res) {
         const TeamModel = this.models.get('Team')
         const teams = await TeamModel.find()
