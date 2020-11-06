@@ -139,6 +139,24 @@ class Lineup extends Model {
     }
 
     /**
+     * Given the player_id/position record, add it to the starting lineup.
+     * @param {object} player_position_record
+     */
+    start_player(player_position_record) {
+        this.benched_player_ids = this.benched_player_ids.filter(x => x !== player_position_record.player_id)
+        this.starting_players = this.starting_players.filter(x => x.player_id !== player_position_record.player_id)
+        this.starting_players.push(player_position_record)
+    }
+
+    /**
+     * Remove all players from the bench and the starting lineup.
+     */
+    clear_lineup() {
+        this.starting_players = []
+        this.benched_player_ids = []
+    }
+
+    /**
      * Cast the lineup to an object which can be returned via the API.
      * @return {Promise<object>}
      */
@@ -159,12 +177,20 @@ class Lineup extends Model {
             // Find the player instance and cast it to an API object
             const player_inst = starting_players.find(x => x.id === player.player_id)
             build_starting_players.push({
-                position: player.position,
-                ...(await player_inst.to_api())
+                ...(await player_inst.to_api()),
+                position: player.position
             })
 
             // remove the position from the array of positions to back-fill
-            lineup_positions = lineup_positions.filter(x => x !== player.position)
+            let found_one = false
+            lineup_positions = lineup_positions.filter(x => {
+                if ( !found_one && x === player.position ) {
+                    found_one = true
+                    return false
+                }
+
+                return true
+            })
         }
 
         // Fill in any missing positions into the data
@@ -180,6 +206,11 @@ class Lineup extends Model {
             const obj = await player.to_api()
             obj.position = 'B'
             build_benched_players.push(obj)
+        }
+
+        // If there are no players on the bench, add a placeholder slot.
+        if ( build_benched_players.length < 1 ) {
+            build_benched_players.push({ position: 'B' })
         }
 
         data.starting_players = build_starting_players

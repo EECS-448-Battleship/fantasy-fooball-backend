@@ -50,6 +50,11 @@ class Team extends Model {
         return new_team
     }
 
+    async lineup() {
+        const Lineup = this.models.get('Lineup')
+        return Lineup.get_and_update_for_team(this)
+    }
+
     async players() {
         const Player = this.models.get('Player')
         return Player.find({

@@ -48,6 +48,11 @@ class MyTeamComponent extends Component {
     static get props() { return [] }
 
     /**
+     * Original team name to compare against.
+     */
+    _original_team_name = ''
+
+    /**
      * The team name.
      * @type {string}
      */
@@ -105,7 +110,7 @@ class MyTeamComponent extends Component {
                     return `
                         <div class="center">
                             <img src="${data.image}" alt="${data.name}" height="50" style="border-radius: 50%">
-                            <span>${data.name} (${data.number})</span>
+                            <span>${data.name} (#${data.number})</span>
                         </div>
                     `
                 }
@@ -191,7 +196,7 @@ class MyTeamComponent extends Component {
     async vue_on_create() {
         console.log('api', api)
         const [my_team, lineup] = await Promise.all([api.get_my_team(), api.get_my_team_current_lineup()])
-        this.team_name = my_team.team_name
+        this.team_name = this._original_team_name = my_team.team_name
         this.overall_data = await api.get_my_team_players()
         this.bench_players = lineup.benched_players
         this.starting_players = lineup.starting_players
@@ -213,15 +218,36 @@ class MyTeamComponent extends Component {
     }
 
     mark_dirty() {
-        this.save_text = 'Unsaved changed'
+        this.save_text = 'Unsaved changes'
+    }
+
+    /**
+     * Fired when the team name changes. Marks the data as needing a save.
+     */
+    watch_team_name() {
+        if ( this.team_name !== this._original_team_name )
+            this.mark_dirty()
     }
 
     async save_changes() {
         this.save_text = 'Saving changes...'
 
-        setTimeout(() => {
-            this.save_text = 'All changes saved.'
-        }, 2000)
+        // Save the team name
+        const team_save_result = await api.save_my_team({ team_name: this.team_name })
+        this.team_name = this._original_team_name = team_save_result.team_name
+
+        // Save the lineup
+        const lineup_data = {
+            starting_players: this.starting_players,
+            benched_players: this.bench_players,
+        }
+
+        const lineup_save_result = await api.save_my_team_lineup(lineup_data)
+        this.bench_players = lineup_save_result.benched_players
+        this.starting_players = lineup_save_result.starting_players
+
+        this.save_text = 'All changes saved.'
+        this.update()
     }
 }
 

@@ -60,7 +60,8 @@ const index = {
      * or middleware that are applied in order.
      */
     post: {
-
+        '/my-team': ['controller::Teams.save_my_team'],
+        '/my-team/lineup': ['controller::Teams.save_my_team_lineup'],
     },
 
     // You can include other HTTP verbs here.

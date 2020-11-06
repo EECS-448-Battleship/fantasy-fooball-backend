@@ -67,6 +67,7 @@ class Player extends Model {
 
     async to_api() {
         return {
+            id: this.id,
             number: this.player_number,
             name: this.full_name,
             position: this.fantasy_position,
