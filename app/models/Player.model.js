@@ -65,6 +65,32 @@ class Player extends Model {
         return new this(model_data)
     }
 
+    static async get_unobligated_players() {
+        const Team = this.prototype.models.get('Team')
+        let obligated_player_ids = []
+
+        const teams = await Team.find()
+        for ( const team of teams ) {
+            obligated_player_ids = obligated_player_ids.concat(team.player_ids)
+        }
+
+        return this.find({
+            _id: {
+                $nin: obligated_player_ids.map(x => this.to_object_id(x))
+            }
+        })
+    }
+
+    async is_obligated() {
+        const Team = this.models.get('Team')
+        const teams = await Team.find()
+        for ( const team of teams ) {
+            if ( team.player_ids.includes(this.id) ) return true
+        }
+
+        return false
+    }
+
     async to_api() {
         return {
             id: this.id,

@@ -6,6 +6,10 @@ const AuthUser = require('flitter-auth/model/User')
  * properties here as you need.
  */
 class User extends AuthUser {
+    static get services() {
+        return [...super.services, 'models']
+    }
+
     static get schema() {
         return {...super.schema, ...{
             // other schema fields here
@@ -13,6 +17,10 @@ class User extends AuthUser {
     }
 
     // Other members and methods here
+    async team() {
+        const Team = this.models.get('Team')
+        return Team.getForUser(this)
+    }
 }
 
 module.exports = exports = User

@@ -1,6 +1,7 @@
 import {Component} from '../../../lib/vues6.js'
 import {fake_players} from '../../module/fake_data.js'
 import {GridCellRenderType} from '../Grid.component.js'
+import {api} from '../../module/api.js'
 import {clone} from '../../module/util.js'
 
 const template = `
@@ -45,7 +46,7 @@ class DraftBoardComponent extends Component {
             renderer: (_, data) => `
                 <div class="center">
                     <img src="${data.image}" alt="${data.name}" height="50" style="border-radius: 50%">
-                    <span>${data.name}</span>
+                    <span>${data.name} (#${data.number})</span>
                 </div>
             `,
         }
@@ -61,7 +62,7 @@ class DraftBoardComponent extends Component {
             renderer: (_, data) => `
                 <div class="center">
                     <img src="${data.image}" alt="${data.name}" height="50" style="border-radius: 50%">
-                    <span>${data.name}</span>
+                    <span>${data.name} (#${data.number})</span>
                 </div>
             `,
         },
@@ -111,14 +112,18 @@ class DraftBoardComponent extends Component {
             button_hidden: (row, col) => this.top_picks.includes(row),
             on_click: (row, col) => {
                 this.top_picks.push(row);
+                api.draft_player(row.id).then(() => {
+
+                });
             },
         },
     ]
 
-    data = clone(fake_players)
+    data = []
 
     async vue_on_create() {
-
+        this.top_picks = await api.get_my_team_players()
+        this.data = await api.get_available_draft_players()
     }
 }
 

@@ -50,6 +50,8 @@ const index = {
         '/my-team': ['controller::Teams.get_my_team'],
         '/my-team/players': ['controller::Teams.get_my_team_players'],
         '/my-team/lineup': ['controller::Teams.get_my_team_current_lineup'],
+
+        '/draft-board/available': ['controller::DraftBoard.get_available_players'],
     },
 
     /*
@@ -62,6 +64,8 @@ const index = {
     post: {
         '/my-team': ['controller::Teams.save_my_team'],
         '/my-team/lineup': ['controller::Teams.save_my_team_lineup'],
+
+        '/draft-board/draft-player': ['controller::DraftBoard.draft_player_to_team'],
     },
 
     // You can include other HTTP verbs here.

@@ -3,6 +3,14 @@ class API {
         this.base_url = APP_BASE_PATH.replace('/app/', '/api/v1/')
     }
 
+    async get_available_draft_players() {
+        return this.get_request('draft-board/available')
+    }
+
+    async draft_player(player_id) {
+        return this.post_request('draft-board/draft-player', { player_id })
+    }
+
     async save_my_team(team_data) {
         return this.post_request('my-team', team_data)
     }
