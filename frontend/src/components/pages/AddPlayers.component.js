@@ -1,6 +1,7 @@
 import { Component } from '../../../lib/vues6.js'
 import { fake_players } from '../../module/fake_data.js'
 import { clone } from '../../module/util.js'
+import { api } from '../../module/api.js'
 
 const template = `
 <div class="page-add-players">
@@ -102,7 +103,15 @@ class AddPlayersComponent extends Component {
      * @return {Promise<void>}
      */
     async vue_on_create() {
-        this.possible_players = [...this.all_players];
+        const available_players = await api.get_available_draft_players()
+        const team_players = await api.get_my_team_players()
+
+        this.all_players = this.possible_players = [...team_players, ...available_players].map(x => {
+            x.showing_stats = false;
+            return x;
+        });
+
+        this.my_team = [...team_players];
         this.filtered_players = [...this.possible_players];
     }
 
