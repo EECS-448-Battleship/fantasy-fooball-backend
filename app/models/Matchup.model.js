@@ -33,11 +33,14 @@ class Matchup extends Model {
         const data = {
             date: '2020-11-11', // TODO generate this in the matches patch
             team_1: home_team.team_name,
-            team_1_projection: 0,
+            team_1_projection: await (await home_team.lineup())?.calculate_fantasy_points() + Math.round(Math.random() * (5 - (-5)) + (-5)),
 
             team_2: visitor_team.team_name,
-            team_2_projection: 0,
+            team_2_projection: await (await visitor_team.lineup())?.calculate_fantasy_points() + Math.round(Math.random() * (5 - (-5)) + (-5)),
         }
+
+        if ( data.team_1_projection < 0 ) data.team_1_projection = 0
+        if ( data.team_2_projection < 0 ) data.team_2_projection = 0
 
         if ( this.complete ) {
             const winner = this.home_team_score > this.visitor_team_score ? home_team : visitor_team

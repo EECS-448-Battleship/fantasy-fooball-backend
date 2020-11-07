@@ -37,7 +37,7 @@ class Lineup extends Model {
         let points = 0
 
         for ( const player of starting_players ) {
-            points += (await player.points_for_week(this.week_num)).fantasy_points
+            points += (await player.points_for_week(this.week_num))?.fantasy_points || 0
         }
 
         return points
