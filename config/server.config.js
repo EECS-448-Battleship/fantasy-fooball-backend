@@ -22,6 +22,7 @@ const server_config = {
 
     sports_data: {
         api_key: env('SPORTSDATA_API_KEY'),
+        season: env('SPORTSDATA_SEASON', '2020REG'),
     },
 
     logging: {

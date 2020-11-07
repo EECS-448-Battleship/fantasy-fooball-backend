@@ -4,7 +4,7 @@ const path = require('path')
 
 class FrontendUnit extends Unit {
     static get services() {
-        return [...super.services, 'configs', 'express', 'canon', 'utility']
+        return [...super.services, 'configs', 'express', 'canon', 'utility', 'models']
     }
 
     constructor(...args) {
@@ -40,6 +40,14 @@ class FrontendUnit extends Unit {
             },
             Express.static(this.directory),
         ])
+
+        // Set the default setting values
+        const Setting = this.models.get('models::setting')  // a built-in helper
+        const default_settings = this.configs.get('settings.default_settings') || []
+
+        for ( const default_setting of default_settings ) {
+            await Setting.guarantee(default_setting.key, default_setting.value)
+        }
     }
 }
 
