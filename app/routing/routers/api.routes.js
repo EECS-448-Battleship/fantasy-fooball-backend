@@ -52,6 +52,8 @@ const index = {
         '/my-team/lineup': ['controller::Teams.get_my_team_current_lineup'],
 
         '/draft-board/available': ['controller::DraftBoard.get_available_players'],
+
+        '/matchups': ['controller::Scores.get_weekly_scores'],
     },
 
     /*

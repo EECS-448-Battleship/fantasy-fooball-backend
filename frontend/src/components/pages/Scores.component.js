@@ -1,5 +1,6 @@
 import {Component} from '../../../lib/vues6.js'
 import {GridCellRenderType} from '../Grid.component.js'
+import {api} from '../../module/api.js'
 
 const template = `
 <div class="page-scores">
@@ -7,7 +8,7 @@ const template = `
         <div class="left">
             <h2>Matchups & Scores - <small>Week {{ current_week }}</small></h2>
         </div>
-        <div class="right">
+        <div class="right" v-if="week_x_data.length > 1">
             <button :class="{ 'disable-click': current_week === max_week }" @click="to_next_week()">Next Week</button><button :class="{ 'disable-click': current_week === min_week }" @click="to_previous_week()">Previous Week</button>
         </div>
     </div>
@@ -32,13 +33,13 @@ class ScoresComponent extends Component {
      * The number of the current week shown in the interface
      * @type {number}
      */
-    current_week = 6
+    current_week = 1
 
     /**
      * Most recent week number.
      * @type {number}
      */
-    max_week = 6
+    max_week = 1
 
     /**
      * Least recent week number.
@@ -50,206 +51,7 @@ class ScoresComponent extends Component {
      * Array of arrays of data for each week with first item being week 1, second being week 2, &c.
      * @type {object[][]}
      */
-    week_x_data = [
-        // Week 1 Data
-        [
-          {
-              "date": "11/2/2020",
-              "team_1": "Team 1",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 50,
-              "team_2": "Team 6",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 73
-          },
-          {
-              "date": "10/23/2020",
-              "team_1": "Team 2",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 66,
-              "team_2": "Team 5",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 71,
-              "winner": "Team 5",
-              "winner_score": "84",
-              "loser_score": "41",
-          },
-          {
-              "date": "10/31/2020",
-              "team_1": "Team 3",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 85,
-              "team_2": "Team 4",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 67
-          },
-        ],
-          // Week 2 Data
-        [
-          {
-              "date": "11/2/2020",
-              "team_1": "Team 1",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 58,
-              "team_2": "Team 6",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 34
-          },
-          {
-              "date": "10/23/2020",
-              "team_1": "Team 2",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 57,
-              "team_2": "Team 5",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 27,
-              "winner": "Team 5",
-              "winner_score": "84",
-              "loser_score": "41",
-          },
-          {
-              "date": "10/31/2020",
-              "team_1": "Team 3",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 48,
-              "team_2": "Team 4",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 49
-          },
-        ],
-          // Week 3 Data
-        [
-          {
-              "date": "11/2/2020",
-              "team_1": "Team 1",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 67,
-              "team_2": "Team 6",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 47
-          },
-          {
-              "date": "10/23/2020",
-              "team_1": "Team 2",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 83,
-              "team_2": "Team 5",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 62,
-              "winner": "Team 5",
-              "winner_score": "84",
-              "loser_score": "41",
-          },
-          {
-              "date": "10/31/2020",
-              "team_1": "Team 3",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 48,
-              "team_2": "Team 4",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 17
-          },
-        ],
-          // Week 4 Data
-        [
-          {
-              "date": "11/2/2020",
-              "team_1": "Team 1",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 30,
-              "team_2": "Team 6",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 41
-          },
-          {
-              "date": "10/23/2020",
-              "team_1": "Team 2",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 65,
-              "team_2": "Team 5",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 27,
-              "winner": "Team 5",
-              "winner_score": "84",
-              "loser_score": "41",
-          },
-          {
-              "date": "10/31/2020",
-              "team_1": "Team 3",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 48,
-              "team_2": "Team 4",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 24
-          },
-        ],
-          // Week 5 Data
-        [
-          {
-              "date": "11/2/2020",
-              "team_1": "Team 1",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 43,
-              "team_2": "Team 6",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 48
-          },
-          {
-              "date": "10/23/2020",
-              "team_1": "Team 2",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 57,
-              "team_2": "Team 5",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 61,
-              "winner": "Team 5",
-              "winner_score": "84",
-              "loser_score": "41",
-          },
-          {
-              "date": "10/31/2020",
-              "team_1": "Team 3",
-              "team_1_logo": "https://via.placeholder.com/150x100",
-              "team_1_projection": 48,
-              "team_2": "Team 4",
-              "team_2_logo": "https://via.placeholder.com/150x100",
-              "team_2_projection": 91
-          },
-        ],
-          // Week 6 Data
-        [
-            {
-                "date": "11/2/2020",
-                "team_1": "Team 1",
-                "team_1_logo": "https://via.placeholder.com/150x100",
-                "team_1_projection": 50,
-                "team_2": "Team 6",
-                "team_2_logo": "https://via.placeholder.com/150x100",
-                "team_2_projection": 37
-            },
-            {
-                "date": "10/23/2020",
-                "team_1": "Team 2",
-                "team_1_logo": "https://via.placeholder.com/150x100",
-                "team_1_projection": 36,
-                "team_2": "Team 5",
-                "team_2_logo": "https://via.placeholder.com/150x100",
-                "team_2_projection": 71,
-                "winner": "Team 5",
-                "winner_score": "84",
-                "loser_score": "41",
-            },
-            {
-                "date": "10/31/2020",
-                "team_1": "Team 3",
-                "team_1_logo": "https://via.placeholder.com/150x100",
-                "team_1_projection": 48,
-                "team_2": "Team 4",
-                "team_2_logo": "https://via.placeholder.com/150x100",
-                "team_2_projection": 1
-            },
-        ]
-    ]
+    week_x_data = []
 
     /**
      * Column definitions for the matchups grid.
@@ -270,7 +72,7 @@ class ScoresComponent extends Component {
             key: 'team_1',
             renderer: (_, data) => `
                 <div style="display: flex; flex-direction: row;">
-                    <img src="${data.team_1_logo}" alt="${data.team_1}">
+<!--                    <img src="${data.team_1_logo}" alt="${data.team_1}">-->
                     <div style="margin-left: 20px">
                         <b>${data.team_1}</b>
                         <p>Projection: ${data.team_1_projection}</p>
@@ -284,7 +86,7 @@ class ScoresComponent extends Component {
             key: 'team_2',
             renderer: (_, data) => `
                 <div style="display: flex; flex-direction: row;">
-                    <img src="${data.team_2_logo}" alt="${data.team_2}">
+<!--                    <img src="${data.team_2_logo}" alt="${data.team_2}">-->
                     <div style="margin-left: 20px">
                         <b>${data.team_2}</b>
                         <p>Projection: ${data.team_2_projection}</p>
@@ -320,6 +122,9 @@ class ScoresComponent extends Component {
      * @return {Promise<void>}
      */
     async vue_on_create() {
+        this.week_x_data = await api.get_matchups()
+        this.max_week = this.current_week = this.week_x_data.length
+
         this.data = this.week_x_data[this.max_week - 1];
     }
 

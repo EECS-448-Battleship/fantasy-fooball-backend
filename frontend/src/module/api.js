@@ -3,6 +3,10 @@ class API {
         this.base_url = APP_BASE_PATH.replace('/app/', '/api/v1/')
     }
 
+    async get_matchups() {
+        return this.get_request('matchups')
+    }
+
     async get_available_draft_players() {
         return this.get_request('draft-board/available')
     }
