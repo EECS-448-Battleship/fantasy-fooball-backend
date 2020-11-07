@@ -50,6 +50,13 @@ class SeedWeeklyPlayerDataPatch extends Injectable {
                         patch_player_id: stat.PlayerID,
                         week_num: week,
                         fantasy_points: stat.FantasyPoints,
+
+                        passing_attempts: stat.PassingAttempts,
+                        passing_completions: stat.PassingCompletions,
+                        passing_yards: stat.PassingYards,
+                        fumbles: stat.Fumbles,
+                        kick_returns: stat.KickReturns,
+                        sacks: stat.Sacks,
                     })
 
                     await weekly_stat.save()
