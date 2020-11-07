@@ -11,12 +11,12 @@ class SportsDataService extends Service {
 
     async is_draft_stage() {
         const Setting = this.models.get('models::setting')
-        return !!this.utility.infer(await Setting.get('in_draft_stage'))
+        return this.utility.infer(await Setting.get('in_draft_stage'))
     }
 
     async current_play_week() {
         const Setting = this.models.get('models::setting')
-        return !!this.utility.infer(await Setting.get('current_week'))
+        return this.utility.infer(await Setting.get('current_week'))
     }
 
     async get_team_players(team_key) {

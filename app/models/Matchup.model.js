@@ -11,6 +11,8 @@ class Matchup extends Model {
             visitor_team_id: String,
             week_num: Number,
             complete: { type: Boolean, default: false },
+            home_team_score: Number,
+            visitor_team_score: Number,
         }
     }
 }
