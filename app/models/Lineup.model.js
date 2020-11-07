@@ -32,6 +32,17 @@ class Lineup extends Model {
         }
     }
 
+    async calculate_fantasy_points() {
+        const starting_players = await this.players_in_starting()
+        let points = 0
+
+        for ( const player of starting_players ) {
+            points += await player.points_for_week(this.week_num)
+        }
+
+        return points
+    }
+
     /**
      * Given a team, fetch the latest draft lineup for that team.
      * This will also update the lineup record so that it includes all players

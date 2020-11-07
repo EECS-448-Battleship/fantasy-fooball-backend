@@ -15,6 +15,16 @@ class Matchup extends Model {
             visitor_team_score: Number,
         }
     }
+
+    async home_team() {
+        const Team = this.models.get('Team')
+        return Team.findById(this.home_team_id)
+    }
+
+    async visitor_team() {
+        const Team = this.models.get('Team')
+        return Team.findById(this.visitor_team_id)
+    }
 }
 
 module.exports = exports = Matchup

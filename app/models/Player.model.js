@@ -81,6 +81,11 @@ class Player extends Model {
         })
     }
 
+    async points_for_week(week_num) {
+        const WeeklyPlayerStat = this.models.get('WeeklyPlayerStat')
+        return WeeklyPlayerStat.findOne({ week_num, player_id: this.id })
+    }
+
     async is_obligated() {
         const Team = this.models.get('Team')
         const teams = await Team.find()
