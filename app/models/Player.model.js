@@ -7,7 +7,7 @@ const { Model } = require('flitter-orm')
  */
 class Player extends Model {
     static get services() {
-        return [...super.services, 'output', 'models']
+        return [...super.services, 'output', 'models', 'sports_data']
     }
 
     /*
@@ -35,6 +35,8 @@ class Player extends Model {
             experience_string: String,
             age: Number,
             photo_url: String,
+
+            seed_stats: Object,
         }
     }
 
@@ -96,7 +98,9 @@ class Player extends Model {
         return false
     }
 
-    async to_api() {
+    async to_api(with_stats = false) {
+        const stat = with_stats ? await this.points_for_week() : undefined
+
         return {
             id: this.id,
             number: this.player_number,
@@ -104,7 +108,7 @@ class Player extends Model {
             position: this.fantasy_position,
             team_name: this.patch_data.patch_team_name,
             image: this.photo_url,
-            stats: {}, // TODO - populate some stats!
+            stats: (await stat?.to_api()) || this.seed_stats || {},
         }
     }
 }

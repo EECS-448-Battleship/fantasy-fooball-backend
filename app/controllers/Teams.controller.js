@@ -43,7 +43,7 @@ class Teams extends Controller {
      */
     async get_my_team_players(req, res, next) {
         const players = await req.user_team.players()
-        return res.api(await Promise.all(players.map(x => x.to_api())))
+        return res.api(await Promise.all(players.map(x => x.to_api(true))))
     }
 
     /**

@@ -60,6 +60,10 @@ class SeedWeeklyPlayerDataPatch extends Injectable {
                     })
 
                     await weekly_stat.save()
+
+                    if ( week === 1 || !player.seed_stats || Object.values(player.seed_stats).length < 1 ) {
+                        player.seed_stats = await weekly_stat.to_api()
+                    }
                 } else {
                     this.output.warn(`      - Player ID ${stat.PlayerID} does not exist.`)
                 }

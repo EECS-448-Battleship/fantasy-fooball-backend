@@ -37,7 +37,7 @@ class Lineup extends Model {
         let points = 0
 
         for ( const player of starting_players ) {
-            points += await player.points_for_week(this.week_num)
+            points += (await player.points_for_week(this.week_num)).fantasy_points
         }
 
         return points
@@ -188,7 +188,7 @@ class Lineup extends Model {
             // Find the player instance and cast it to an API object
             const player_inst = starting_players.find(x => x.id === player.player_id)
             build_starting_players.push({
-                ...(await player_inst.to_api()),
+                ...(await player_inst.to_api(true)),
                 position: player.position
             })
 
@@ -214,7 +214,7 @@ class Lineup extends Model {
         const build_benched_players = []
         for ( const player of bench_players ) {
             // Cast the starting player to an API object
-            const obj = await player.to_api()
+            const obj = await player.to_api(true)
             obj.position = 'B'
             build_benched_players.push(obj)
         }

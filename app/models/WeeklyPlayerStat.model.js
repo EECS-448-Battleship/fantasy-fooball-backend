@@ -20,6 +20,17 @@ class WeeklyPlayerStat extends Model {
             sacks: Number,
         }
     }
+
+    async to_api() {
+        return {
+            'Passing Attempts': this.passing_attempts,
+            'Passing Completions': this.passing_completions,
+            'Passing Yards': this.passing_yards,
+            'Fumbles': this.fumbles,
+            'Kick Returns': this.kick_returns,
+            'Sacks': this.sacks,
+        }
+    }
 }
 
 module.exports = exports = WeeklyPlayerStat
