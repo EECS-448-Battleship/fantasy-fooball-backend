@@ -49,10 +49,10 @@ class Matchup extends Model {
         const data = {
             date: '2020-11-11', // TODO generate this in the matches patch
             team_1: home_team.team_name,
-            team_1_projection: await (await home_team.lineup())?.calculate_fantasy_points() + Math.round(Math.random() * (5 - (-5)) + (-5)),
+            team_1_projection: await (await home_team.lineup())?.calculate_fantasy_points() + Math.round(Math.random() * (2 - (-2)) + (-2)),
 
             team_2: visitor_team.team_name,
-            team_2_projection: await (await visitor_team.lineup())?.calculate_fantasy_points() + Math.round(Math.random() * (5 - (-5)) + (-5)),
+            team_2_projection: await (await visitor_team.lineup())?.calculate_fantasy_points() + Math.round(Math.random() * (2 - (-2)) + (-2)),
         }
 
         if ( data.team_1_projection < 0 ) data.team_1_projection = 0
