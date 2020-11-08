@@ -1,6 +1,4 @@
 import { Component } from '../../../lib/vues6.js'
-import { fake_players } from '../../module/fake_data.js'
-import { clone } from '../../module/util.js'
 import { api } from '../../module/api.js'
 
 const template = `
@@ -96,7 +94,7 @@ class AddPlayersComponent extends Component {
      * All available players, whether they are on the user's team or not.
      * @type {object[]}
      */
-    all_players = clone(fake_players)
+    all_players = []
 
     /**
      * Called when the page is instantiated.

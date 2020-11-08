@@ -1,6 +1,8 @@
 class API {
+    _fetch = (...all) => fetch(...all)
+
     constructor() {
-        this.base_url = APP_BASE_PATH.replace('/app/', '/api/v1/')
+        this.base_url = typeof window !== 'undefined' ? APP_BASE_PATH.replace('/app/', '/api/v1/') : '/api/v1/'
     }
 
     async get_status() {
@@ -47,7 +49,7 @@ class API {
         if ( !Array.isArray(parts) ) parts = [parts]
 
         const url = this.build_url(...parts)
-        const result = await fetch(url, {
+        const result = await this._fetch(url, {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -61,7 +63,7 @@ class API {
 
     async get_request(...parts) {
         const url = this.build_url(...parts)
-        const result = await fetch(url)
+        const result = await this._fetch(url)
         return (await result.json()).data
     }
 

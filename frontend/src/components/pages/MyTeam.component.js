@@ -120,7 +120,7 @@ class MyTeamComponent extends Component {
             header: '',
             key: 'name',
             type: GridCellRenderType.Component,
-            component: Vue.component('app-action-button'),
+            component: window.Vue ? Vue.component('app-action-button') : undefined,
             button_color: (row, col) => this.moving_player ? '#CC5746' : '#0582CA',
             button_text: (row, col) => {
                 return this.moving_player ? 'Here' : 'Move'

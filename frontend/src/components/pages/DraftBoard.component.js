@@ -1,8 +1,6 @@
 import {Component} from '../../../lib/vues6.js'
-import {fake_players} from '../../module/fake_data.js'
 import {GridCellRenderType} from '../Grid.component.js'
 import {api} from '../../module/api.js'
-import {clone} from '../../module/util.js'
 
 const template = `
 <div class="page-draft-board">
@@ -106,7 +104,7 @@ class DraftBoardComponent extends Component {
             header: '',
             key: 'stats',
             type: GridCellRenderType.Component,
-            component: Vue.component('app-action-button'),
+            component: window.Vue ? Vue.component('app-action-button') : undefined,
             button_color: (row, col) => '#CC5746',
             button_text: (row, col) => 'Draft',
             button_hidden: (row, col) => this.top_picks.includes(row),

@@ -99,7 +99,7 @@ class ScoresComponent extends Component {
             type: GridCellRenderType.HTML,
             key: 'winner',
             renderer: (_, data) => {
-                if ( data?.winner ) {
+                if ( data && data.winner ) {
                     return `
                         <div><b>Winner:</b> ${data.winner}</div>
                         <div><b>Score: </b> ${data.winner_score} / ${data.loser_score}</div>
