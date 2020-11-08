@@ -17,6 +17,9 @@ class GenerateMatchupsForWeekPatch extends Injectable {
         return [...super.services, 'models', 'sports_data', 'output']
     }
 
+    /**
+     * 
+     */
     async run() {
         const Team = this.models.get('Team')
         const Matchup = this.models.get('Matchup')
@@ -112,6 +115,11 @@ class GenerateMatchupsForWeekPatch extends Injectable {
         this.output.success('Complete.')
     }
 
+    /**
+     * 
+     * @param  team 
+     * @returns data to represent what teams have been played by the param team
+     */
     async get_teams_played_by_team(team) {
         const Matchup = this.models.get('Matchup')
         const home_games = await Matchup.find({ home_team_id: team.id })

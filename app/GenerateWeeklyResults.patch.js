@@ -1,10 +1,19 @@
 const { Injectable } = require('flitter-di')
 
+/**
+ * GenerateWeeklyResultsPatch
+ * @extends Injectable
+ * ----------------------------------------------------------------------------
+ */
 class GenerateWeeklyResultsPatch extends Injectable {
     static get services() {
         return [...super.services, 'models', 'sports_data']
     }
 
+    /**
+     * Runs the patch
+     * @returns {Promise<void>}
+     */
     async run() {
         const Matchup = this.models.get('Matchup')
         const current_week = await this.sports_data.current_play_week()

@@ -2,6 +2,11 @@ const Unit = require('libflitter/Unit')
 const Express = require('express')
 const path = require('path')
 
+/**
+ * FrontendUnit
+ * @extends Unit 
+ * ----------------------------------------------------------------------------------------
+ */
 class FrontendUnit extends Unit {
     static get services() {
         return [...super.services, 'configs', 'express', 'canon', 'utility', 'models']
@@ -17,6 +22,11 @@ class FrontendUnit extends Unit {
         this.directory = this.utility.path(this.configs.get('server.frontend_path'))
     }
 
+    /**
+     * 
+     * @param  app
+     *  
+     */
     async go(app) {
         app.express.use('/app', [
             this.canon.get('middleware::auth:UserOnly'),
