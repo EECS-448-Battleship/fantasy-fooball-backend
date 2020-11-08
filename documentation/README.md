@@ -74,8 +74,7 @@ All tests are written expressively using the Mocha testing library.
 After installing the Node dependencies, you can run the frontend and backend tests like so:
 
 ```shell script
-yarn run test_frontend
-yarn run test_backend
+yarn run test
 ```
 
 ## Works Cited

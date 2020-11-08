@@ -33,6 +33,7 @@
   },
   "scripts": {
     "test_frontend": "./node_modules/.bin/mocha -r esm --reporter spec test/frontend",
-    "test_backend": "./node_modules/.bin/mocha --reporter spec test/backend"
+    "test_backend": "./node_modules/.bin/mocha --reporter spec test/backend",
+    "test": "./node_modules/.bin/mocha -r esm --reporter spec test/frontend && ./node_modules/.bin/mocha --reporter spec test/backend"
   }
 }
