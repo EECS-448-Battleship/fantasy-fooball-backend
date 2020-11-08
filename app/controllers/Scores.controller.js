@@ -30,6 +30,47 @@ class ScoresController extends Controller {
 
         return res.api(weekly_data)
     }
+
+    /**
+     * Returns the league standings with calculated stats
+     * @param req
+     * @param res
+     * @param next
+     * @return {Promise<Array<object>>}
+     */
+    async get_league_standings(req, res, next) {
+        const Team = this.models.get('Team')
+        const all_teams = await Team.find()
+        const stat_records = []
+
+        for ( const team of all_teams ) {
+            const rec = await team.cumulative_data()
+            rec.team_name = team.team_name
+            stat_records.push(rec)
+        }
+
+        stat_records.sort((a, b) => {
+            if ( a.wins === b.wins ) {
+                return a.points_scored - b.points_scored
+            }
+
+            return a.wins > b.wins ? 1 : -1
+        })
+
+        return res.api(stat_records.map((x, i) => {
+            return {
+                standing: {
+                    rank: i + 1,
+                    win_loss: `${x.wins}/${x.losses}`,
+                },
+                team_name: x.team_name,
+                stats: [
+                    { name: 'Total Points Scored', value: x.points_scored },
+                    { name: 'Total Points Allowed', value: x.points_allowed },
+                ],
+            }
+        }))
+    }
 }
 
 module.exports = exports = ScoresController

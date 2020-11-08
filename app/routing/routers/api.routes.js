@@ -54,6 +54,7 @@ const index = {
         '/draft-board/available': ['controller::DraftBoard.get_available_players'],
 
         '/matchups': ['controller::Scores.get_weekly_scores'],
+        '/league-standings': ['controller::Scores.get_league_standings'],
     },
 
     /*

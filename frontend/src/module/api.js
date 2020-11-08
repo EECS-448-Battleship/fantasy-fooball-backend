@@ -3,6 +3,10 @@ class API {
         this.base_url = APP_BASE_PATH.replace('/app/', '/api/v1/')
     }
 
+    async get_standings() {
+        return this.get_request('league-standings')
+    }
+
     async get_matchups() {
         return this.get_request('matchups')
     }

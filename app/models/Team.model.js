@@ -59,7 +59,7 @@ class Team extends Model {
     }
 
     /**
-     * 
+     * Returns the players associated with the team.
      */
     async players() {
         const Player = this.models.get('Player')
@@ -68,6 +68,51 @@ class Team extends Model {
                 $in: this.player_ids.map(x => Player.to_object_id(x))
             }
         })
+    }
+
+    /**
+     * Get the cumulative data for the team (total wins, losses, points scored & allowed)
+     * @return object
+     */
+    async cumulative_data() {
+        const Matchup = this.models.get('Matchup')
+        const home_matchups = await Matchup.find({ home_team_id: this.id })
+        const visitor_matchups = await Matchup.find({ visitor_team_id: this.id })
+
+        const data = {
+            wins: 0,
+            losses: 0,
+            points_scored: 0,
+            points_allowed: 0,
+        }
+
+        for ( const matchup of home_matchups ) {
+            if ( !matchup.complete ) continue
+
+            data.points_scored += matchup.home_team_score
+            data.points_allowed += matchup.visitor_team_score
+
+            if ( matchup.home_team_score > matchup.visitor_team_score ) {
+                data.wins += 1
+            } else {
+                data.losses += 0
+            }
+        }
+
+        for ( const matchup of visitor_matchups ) {
+            if ( !matchup.complete ) continue
+
+            data.points_scored += matchup.visitor_team_score
+            data.points_allowed += matchup.home_team_score
+
+            if ( matchup.visitor_team_score > matchup.home_team_score ) {
+                data.wins += 1
+            } else {
+                data.losses += 0
+            }
+        }
+
+        return data
     }
 
     /**
