@@ -47,15 +47,25 @@ const index = {
             'controller::Home.welcome'
         ],
 
+        // Get information about the user's team
         '/my-team': ['controller::Teams.get_my_team'],
+
+        // Get a list of the user's team's players
         '/my-team/players': ['controller::Teams.get_my_team_players'],
+
+        // Get the uesr's team's current lineup
         '/my-team/lineup': ['controller::Teams.get_my_team_current_lineup'],
 
+        // Get a list of players available to be drafted
         '/draft-board/available': ['controller::DraftBoard.get_available_players'],
 
+        // Get a list of matchup, grouped by week number
         '/matchups': ['controller::Scores.get_weekly_scores'],
+
+        // Get the current league standings
         '/league-standings': ['controller::Scores.get_league_standings'],
 
+        // Get the status of the current user's session, and game play
         '/status': ['controller::Home.get_status'],
     },
 
@@ -67,9 +77,13 @@ const index = {
      * or middleware that are applied in order.
      */
     post: {
+        // Save changes to the current user's team
         '/my-team': ['controller::Teams.save_my_team'],
+
+        // Save the current user's team's lineup
         '/my-team/lineup': ['controller::Teams.save_my_team_lineup'],
 
+        // Draft the given player to the current user's team
         '/draft-board/draft-player': ['controller::DraftBoard.draft_player_to_team'],
     },
 

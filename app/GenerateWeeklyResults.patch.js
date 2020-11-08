@@ -2,8 +2,11 @@ const { Injectable } = require('flitter-di')
 
 /**
  * GenerateWeeklyResultsPatch
- * @extends Injectable
  * ----------------------------------------------------------------------------
+ * A patch which generates the weekly team results using the player stat data
+ * for teh currently configured play week.
+ *
+ * @extends Injectable
  */
 class GenerateWeeklyResultsPatch extends Injectable {
     static get services() {

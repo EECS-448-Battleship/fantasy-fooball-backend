@@ -1,8 +1,10 @@
 const { Model } = require('flitter-orm')
 /**
  * WeeklyPlayerStat model
- * @extends Model
  * -----------------------------------------------------------------------
+ * A record containing the statistics for a single player for a single week.
+ *
+ * @extends Model
  */
 class WeeklyPlayerStat extends Model {
     static get services() {
@@ -29,7 +31,8 @@ class WeeklyPlayerStat extends Model {
     }
 
     /**
-     * updates the API's data
+     * Cast the stats to a format expected by the API.
+     * @return Promise<object>
      */
     async to_api() {
         return {

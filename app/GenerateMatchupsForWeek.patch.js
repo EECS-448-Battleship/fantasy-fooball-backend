@@ -18,7 +18,7 @@ class GenerateMatchupsForWeekPatch extends Injectable {
     }
 
     /**
-     * 
+     * Run the patch.
      */
     async run() {
         const Team = this.models.get('Team')
@@ -116,9 +116,9 @@ class GenerateMatchupsForWeekPatch extends Injectable {
     }
 
     /**
-     * 
-     * @param  team 
-     * @returns data to represent what teams have been played by the param team
+     * Get a list of all teams played by the given team.
+     * @param {Team} team
+     * @returns {Promise<Array<string>>}
      */
     async get_teams_played_by_team(team) {
         const Matchup = this.models.get('Matchup')

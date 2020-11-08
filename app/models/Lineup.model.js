@@ -32,6 +32,10 @@ class Lineup extends Model {
         }
     }
 
+    /**
+     * Calculate the fantasy points scored by the starting players on this lineup.
+     * @return {Promise<number>}
+     */
     async calculate_fantasy_points() {
         const starting_players = await this.players_in_starting()
         let points = 0

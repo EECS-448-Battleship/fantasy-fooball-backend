@@ -1,22 +1,27 @@
 const { Model } = require('flitter-orm')
 const ActiveScope = require('./scopes/Active.scope')
 
-/*
+/**
  * Player Model
  * -------------------------------------------------------------
+ * A model representing a single player in the game.
+ *
+ * @extends Model
  */
 class Player extends Model {
     static get services() {
         return [...super.services, 'output', 'models', 'sports_data']
     }
 
+    // Enable soft-deletes using the active scope
     static scopes = [new ActiveScope()]
 
-    /*
+    /**
      * Define the flitter-orm schema of the model.
      */
     static get schema() {
         return {
+            // Data used by the patches internally, but not exposed to the API
             patch_data: {
                 patch_team_id: Number,
                 patch_team_name: String,
@@ -24,6 +29,7 @@ class Player extends Model {
                 player_id: Number,
                 draft_position: Number,
             },
+
             player_number: Number,
             first_name: String,
             last_name: String,
@@ -38,6 +44,7 @@ class Player extends Model {
             age: Number,
             photo_url: String,
 
+            // Statistics pre-generated for the player to optimize performance
             seed_stats: Object,
 
             // False if the player doesn't have any week-1 stats.
@@ -74,7 +81,8 @@ class Player extends Model {
     }
 
     /**
-     * returns the id's of the unobligated players
+     * returns all of the unobligated players across all teams
+     * @return Promise<Array<Player>>
      */
     static async get_unobligated_players() {
         const Team = this.prototype.models.get('Team')
@@ -93,9 +101,9 @@ class Player extends Model {
     }
 
     /**
-     * 
-     * @param week_num 
-     * @returns the points scored of that week
+     * Returns the stats for the player for the given week.
+     * @param {number} week_num
+     * @returns Promise<WeeklyPlayerStat>
      */
     async points_for_week(week_num) {
         const WeeklyPlayerStat = this.models.get('WeeklyPlayerStat')
@@ -103,8 +111,8 @@ class Player extends Model {
     }
 
     /**
-     * @returns true if the player is obligated
-     * @returns false if the player is not obligates
+     * Determine whether the player belongs to a team or not.
+     * @returns {Promise<boolean>} - true if the player is obligated
      */
     async is_obligated() {
         const Team = this.models.get('Team')
@@ -117,12 +125,13 @@ class Player extends Model {
     }
 
     /**
-     * 
-     * @param  with_stats 
-     * @returns updates the API's data
+     * Cast the player to a format compatible with the API.
+     * @param {boolean} [with_stats = false] - if true, look up the player's weekly stats
+     * @returns Promise<object>
      */
     async to_api(with_stats = false) {
-        const stat = with_stats ? await this.points_for_week() : undefined
+        const current_week = await this.sports_data.current_play_week()
+        const stat = with_stats ? await this.points_for_week(current_week) : undefined
 
         return {
             id: this.id,

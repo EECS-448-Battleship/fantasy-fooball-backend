@@ -1,8 +1,12 @@
 const { Controller } = require('libflitter')
+
 /**
  * ScoresController
- * @extends Controller
  * ----------------------------------------------------------------------
+ * This controller contains logic for handling API requests related to the
+ * weekly scores and matchups endpoints.
+ *
+ * @extends Controller
  */
 class ScoresController extends Controller {
     static get services() {
@@ -22,6 +26,7 @@ class ScoresController extends Controller {
         const current_week = await this.sports_data.current_play_week()
         const weekly_data = []
 
+        // Convert all of the matchup instances to API format for each week
         for ( let i = 1; i <= current_week; i += 1 ) {
             const matchups = await Matchup.find({ week_num: i })
             const api_data = await Promise.all(matchups.map(x => x.to_api()))
@@ -43,12 +48,14 @@ class ScoresController extends Controller {
         const all_teams = await Team.find()
         const stat_records = []
 
+        // Generate the cumulative team data for all teams
         for ( const team of all_teams ) {
             const rec = await team.cumulative_data()
             rec.team_name = team.team_name
             stat_records.push(rec)
         }
 
+        // Sort the teams by number of wins, then number of points scored
         stat_records.sort((a, b) => {
             if ( a.wins === b.wins ) {
                 return a.points_scored - b.points_scored
@@ -57,6 +64,7 @@ class ScoresController extends Controller {
             return a.wins > b.wins ? 1 : -1
         })
 
+        // Return the records in a format compatible with the front-end
         return res.api(stat_records.map((x, i) => {
             return {
                 standing: {

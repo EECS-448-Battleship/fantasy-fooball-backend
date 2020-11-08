@@ -1,15 +1,18 @@
 const { Model } = require('flitter-orm')
 
-/*
+/**
  * Team Model
  * -------------------------------------------------------------
+ * A model representing a single team in the game.
+ *
+ * @extends Model
  */
 class Team extends Model {
     static get services() {
         return [...super.services, 'output', 'models']
     }
 
-    /*
+    /**
      * Define the flitter-orm schema of the model.
      */
     static get schema() {
@@ -52,6 +55,7 @@ class Team extends Model {
 
     /**
      * returns the lineup
+     * @return Promise<Lineup>
      */
     async lineup() {
         const Lineup = this.models.get('Lineup')
@@ -60,6 +64,7 @@ class Team extends Model {
 
     /**
      * Returns the players associated with the team.
+     * @return Promise<Array<Player>>
      */
     async players() {
         const Player = this.models.get('Player')
@@ -116,7 +121,8 @@ class Team extends Model {
     }
 
     /**
-     * updates the API's data
+     * Cast the team to the format expected for the API.
+     * @return Promise<object>
      */
     async to_api() {
         let user

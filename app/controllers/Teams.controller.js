@@ -1,8 +1,12 @@
 const { Controller } = require('libflitter')
 
-/*
+/**
  * Teams Controller
  * -------------------------------------------------------------
+ * This controller contains logic related to viewing and managing
+ * the user's team, team lineups, and team players.
+ *
+ * @extends Controller
  */
 class Teams extends Controller {
     static get services() {
@@ -78,10 +82,12 @@ class Teams extends Controller {
                 .api()
         }
 
+        // fetch the team players & the current lineup
         const player_ids = (await req.user_team.players()).map(x => x.id)
         const lineup = await req.user_team.lineup()
         lineup.clear_lineup()
 
+        // Add all the starting players to the lineup
         for ( const player of req.body.starting_players ) {
             if ( !player.id || !player.position ) continue;
 
@@ -90,6 +96,7 @@ class Teams extends Controller {
                 position: player.position,
             }
 
+            // Don't allow adding other teams' players to the lineup
             if ( !player_ids.includes(lineup_record.player_id) ) {
                 return res.status(400)
                     .message(`Sorry, the player ${lineup_record.player_id} is not on your team.`)
@@ -99,6 +106,7 @@ class Teams extends Controller {
             lineup.start_player(lineup_record)
         }
 
+        // Bench all the other players
         for ( const player of req.body.benched_players ) {
             if ( !player.id ) continue;
 
@@ -111,17 +119,11 @@ class Teams extends Controller {
             lineup.bench_player(player)
         }
 
-        console.log('pre save', lineup)
-
         // Save the partial lineup
         await lineup.save()
 
-        console.log('post save', lineup)
-
         // Fetch a fresh version to fill in any missing players
         const corrected_lineup = await req.user_team.lineup()
-
-        console.log('corrected', corrected_lineup)
 
         return res.api(await corrected_lineup.to_api())
     }

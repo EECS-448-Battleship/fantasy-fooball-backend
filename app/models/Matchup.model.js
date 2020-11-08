@@ -1,8 +1,10 @@
 const { Model } = require('flitter-orm')
 /**
  * Matchup
- * @extends Model
  * ---------------------------------------------------------------------------
+ * A model representing a single scheduled match-up between two teams.
+ *
+ * @extends Model
  */
 class Matchup extends Model {
     static get services() {
@@ -40,7 +42,8 @@ class Matchup extends Model {
     }
 
     /**
-     * updates the API's data
+     * Format this matchup to be compatible with the API output.
+     * @returns Promise<object>
      */
     async to_api() {
         const home_team = await this.home_team()

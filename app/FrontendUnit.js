@@ -4,8 +4,11 @@ const path = require('path')
 
 /**
  * FrontendUnit
- * @extends Unit 
  * ----------------------------------------------------------------------------------------
+ * A Flitter application unit which sets up routes for accessing the javascript front-end
+ * pages we created in Project 3.
+ *
+ * @extends Unit
  */
 class FrontendUnit extends Unit {
     static get services() {
@@ -23,9 +26,8 @@ class FrontendUnit extends Unit {
     }
 
     /**
-     * 
-     * @param  app
-     *  
+     * Initializes the unit. Creates the `/app` static endpoing and default settings.
+     * @param {FlitterApp} app
      */
     async go(app) {
         app.express.use('/app', [

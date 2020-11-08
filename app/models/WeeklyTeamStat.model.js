@@ -1,8 +1,10 @@
 const { Model } = require('flitter-orm')
 /**
  * Weekly Team Stat model
- * @extends Model
  * ---------------------------------------------------------------------------
+ * A record containing the stats for a single team for a single lineup for a single week.
+ *
+ * @extends Model
  */
 class WeeklyTeamStat extends Model {
     static get services() {

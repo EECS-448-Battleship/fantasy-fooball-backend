@@ -1,8 +1,12 @@
 const { Controller } = require('libflitter')
 /**
  * DraftBoard controller
- * @extends Controller
  * ------------------------------------------------------------------------
+ * This controller contains logic for handling API requests related to fetching
+ * and drafting available players. Its methods should handle Express requests &
+ * responses.
+ *
+ * @extends Controller
  */
 class DraftBoard extends Controller {
     static get services() {
@@ -42,6 +46,7 @@ class DraftBoard extends Controller {
                 .api()
         }
 
+        // look up the player specified in the request
         const Player = this.models.get('Player')
         const player = await Player.findById(req.body.player_id)
         if ( !player ) {
@@ -50,6 +55,7 @@ class DraftBoard extends Controller {
                 .api()
         }
 
+        // Don't allow drafting already-drafted players
         if ( await player.is_obligated() ) {
             return res.status(400)
                 .message('This player has already been drafted.')
