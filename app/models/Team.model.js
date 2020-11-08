@@ -119,11 +119,15 @@ class Team extends Model {
      * updates the API's data
      */
     async to_api() {
-        const User = this.models.get('auth:User')
+        let user
+        try {
+            const User = this.models.get('auth:User')
+            user = await User.findById(this.user_id)
+        } catch(e) {}
 
         return {
             user_id: this.user_id,
-            user_display: (await User.findById(this.user_id))?.uid || 'Unknown User',
+            user_display: user?.uid || 'Unknown User',
             team_name: this.team_name,
             team_num: this.team_num,
         }
