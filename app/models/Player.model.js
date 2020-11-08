@@ -1,5 +1,5 @@
 const { Model } = require('flitter-orm')
-
+const ActiveScope = require('./scopes/Active.scope')
 
 /*
  * Player Model
@@ -9,6 +9,8 @@ class Player extends Model {
     static get services() {
         return [...super.services, 'output', 'models', 'sports_data']
     }
+
+    static scopes = [new ActiveScope()]
 
     /*
      * Define the flitter-orm schema of the model.
@@ -37,6 +39,10 @@ class Player extends Model {
             photo_url: String,
 
             seed_stats: Object,
+
+            // False if the player doesn't have any week-1 stats.
+            // If so, they will be hidden to make the game more playable.
+            is_active: { type: Boolean, default: true },
         }
     }
 

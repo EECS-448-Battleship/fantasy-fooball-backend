@@ -33,6 +33,9 @@ class SeedWeeklyPlayerDataPatch extends Injectable {
         // Clear existing data
         await WeeklyPlayerStat.deleteMany()
 
+        // Array of players with week 1 stats
+        const player_ids_with_week_1_stats = []
+
         // Populate the weekly player stats for all weeks in the range
         for ( let week = start_week; week <= end_week; week += 1 ) {
             this.output.info(`Building weekly player stats for week ${week}...`)
@@ -61,6 +64,10 @@ class SeedWeeklyPlayerDataPatch extends Injectable {
 
                     await weekly_stat.save()
 
+                    if ( week === 1 ) {
+                        player_ids_with_week_1_stats.push(player.id)
+                    }
+
                     if ( week === 1 || !player.seed_stats || Object.values(player.seed_stats).length < 1 ) {
                         player.seed_stats = await weekly_stat.to_api()
                     }
@@ -69,6 +76,19 @@ class SeedWeeklyPlayerDataPatch extends Injectable {
                 }
             }
             this.output.success(`    - complete`)
+        }
+
+        this.output.info('Deactivating players without week 1 stats...')
+        const inactive_players = await Player.find({
+            _id: {
+                $nin: player_ids_with_week_1_stats.map(x => Player.to_object_id(x)),
+            },
+        })
+
+        this.output.info(`Deactivating ${inactive_players.length} players...`)
+        for ( const player of inactive_players ) {
+            player.is_active = false
+            await player.save()
         }
 
         this.output.success('Complete!')
