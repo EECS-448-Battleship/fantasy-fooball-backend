@@ -130,8 +130,11 @@ class Player extends Model {
      * @returns Promise<object>
      */
     async to_api(with_stats = false) {
-        const current_week = await this.sports_data.current_play_week()
-        const stat = with_stats ? await this.points_for_week(current_week) : undefined
+        let stat
+        try {
+            const current_week = await this.sports_data.current_play_week()
+            stat = with_stats ? await this.points_for_week(current_week) : undefined
+        } catch (e) {}
 
         return {
             id: this.id,

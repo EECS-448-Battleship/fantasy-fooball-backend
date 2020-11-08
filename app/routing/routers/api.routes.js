@@ -40,13 +40,6 @@ const index = {
      * or middleware that are applied in order.
      */
     get: {
-        // handlers should be a list of either controller:: or middleware:: references
-        // e.g. middleware::HomeLogger
-        // e.g. controller::Home.welcome
-        '/': [
-            'controller::Home.welcome'
-        ],
-
         // Get information about the user's team
         '/my-team': ['controller::Teams.get_my_team'],
 
