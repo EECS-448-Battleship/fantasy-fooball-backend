@@ -1,5 +1,6 @@
 import {Component} from '../../lib/vues6.js'
 import {router} from '../module/routing.js'
+import {api} from '../module/api.js'
 
 const template = `
 <div class="top-level-container">
@@ -48,11 +49,21 @@ class TopLevelComponent extends Component {
         { title: 'Draft Board', page: 'draft-board' },
     ]
 
+    status = {}
+
     /**
      * Called when the component is initialized.
      * @return {Promise<void>}
      */
     async vue_on_create() {
+        this.status = await api.get_status()
+
+        if ( this.status.is_draft_stage ) {
+            this.navbar_items = this.navbar_items.filter(x => !['my-team/add-players', 'scores', 'league'].includes(x.page))
+        } else {
+            this.navbar_items = this.navbar_items.filter(x => !['draft-board'].includes(x.page))
+        }
+
         // Listen for navigation changes.
         this.router_subscription = router.subscribe((path, args) => this.on_route_change(path, args))
         this.current_route = router.current_route

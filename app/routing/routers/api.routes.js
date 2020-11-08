@@ -55,6 +55,8 @@ const index = {
 
         '/matchups': ['controller::Scores.get_weekly_scores'],
         '/league-standings': ['controller::Scores.get_league_standings'],
+
+        '/status': ['controller::Home.get_status'],
     },
 
     /*
