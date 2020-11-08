@@ -1,10 +1,21 @@
 const { Controller } = require('libflitter')
-
+/**
+ * ScoresController
+ * @extends Controller
+ * ----------------------------------------------------------------------
+ */
 class ScoresController extends Controller {
     static get services() {
         return [...super.services, 'models', 'sports_data']
     }
 
+    /**
+     * Returns the weekly scores
+     * @param  req 
+     * @param  res 
+     * @param  next 
+     * @returns
+     */
     async get_weekly_scores(req, res, next) {
         const Matchup = this.models.get('Matchup')
 

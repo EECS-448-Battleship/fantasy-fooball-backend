@@ -1,10 +1,21 @@
 const { Controller } = require('libflitter')
-
+/**
+ * DraftBoard controller
+ * @extends Controller
+ * ------------------------------------------------------------------------
+ */
 class DraftBoard extends Controller {
     static get services() {
         return [...super.services, 'models']
     }
 
+    /**
+     * Returns the API data containing the players available to draft
+     * @param  req 
+     * @param  res 
+     * @param  next 
+     * @returns 
+     */
     async get_available_players(req, res, next) {
         const Player = this.models.get('Player')
         const players = await Player.get_unobligated_players()
@@ -17,6 +28,13 @@ class DraftBoard extends Controller {
         return res.api(api_data)
     }
 
+    /**
+     * adds the selected player to the team 
+     * @param  req 
+     * @param  res 
+     * @param  next 
+     * @returns
+     */
     async draft_player_to_team(req, res, next) {
         if ( !req.body.player_id ) {
             return res.status(400)

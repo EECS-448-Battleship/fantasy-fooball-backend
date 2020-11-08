@@ -67,6 +67,9 @@ class Player extends Model {
         return new this(model_data)
     }
 
+    /**
+     * returns the id's of the unobligated players
+     */
     static async get_unobligated_players() {
         const Team = this.prototype.models.get('Team')
         let obligated_player_ids = []
@@ -83,11 +86,20 @@ class Player extends Model {
         })
     }
 
+    /**
+     * 
+     * @param week_num 
+     * @returns the points scored of that week
+     */
     async points_for_week(week_num) {
         const WeeklyPlayerStat = this.models.get('WeeklyPlayerStat')
         return WeeklyPlayerStat.findOne({ week_num, player_id: this.id })
     }
 
+    /**
+     * @returns true if the player is obligated
+     * @returns false if the player is not obligates
+     */
     async is_obligated() {
         const Team = this.models.get('Team')
         const teams = await Team.find()
@@ -98,6 +110,11 @@ class Player extends Model {
         return false
     }
 
+    /**
+     * 
+     * @param  with_stats 
+     * @returns updates the API's data
+     */
     async to_api(with_stats = false) {
         const stat = with_stats ? await this.points_for_week() : undefined
 

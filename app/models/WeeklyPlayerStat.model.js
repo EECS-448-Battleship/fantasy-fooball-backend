@@ -1,10 +1,17 @@
 const { Model } = require('flitter-orm')
-
+/**
+ * WeeklyPlayerStat model
+ * @extends Model
+ * -----------------------------------------------------------------------
+ */
 class WeeklyPlayerStat extends Model {
     static get services() {
         return [...super.services, 'models']
     }
 
+    /**
+     * defines the schema of the particular model
+     */
     static get schema() {
         return {
             player_id: String,
@@ -21,6 +28,9 @@ class WeeklyPlayerStat extends Model {
         }
     }
 
+    /**
+     * updates the API's data
+     */
     async to_api() {
         return {
             'Passing Attempts': this.passing_attempts,

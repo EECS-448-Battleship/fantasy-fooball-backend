@@ -1,10 +1,17 @@
 const { Model } = require('flitter-orm')
-
+/**
+ * Matchup
+ * @extends Model
+ * ---------------------------------------------------------------------------
+ */
 class Matchup extends Model {
     static get services() {
         return [...super.services, 'models']
     }
 
+    /**
+     * define the schema of the model
+     */
     static get schema() {
         return {
             home_team_id: String,
@@ -16,16 +23,25 @@ class Matchup extends Model {
         }
     }
 
+    /**
+     * @returns the data of the home team
+     */
     async home_team() {
         const Team = this.models.get('Team')
         return Team.findById(this.home_team_id)
     }
 
+    /**
+     * @returns the data of the visitor team
+     */
     async visitor_team() {
         const Team = this.models.get('Team')
         return Team.findById(this.visitor_team_id)
     }
 
+    /**
+     * updates the API's data
+     */
     async to_api() {
         const home_team = await this.home_team()
         const visitor_team = await this.visitor_team()

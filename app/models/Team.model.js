@@ -50,11 +50,17 @@ class Team extends Model {
         return new_team
     }
 
+    /**
+     * returns the lineup
+     */
     async lineup() {
         const Lineup = this.models.get('Lineup')
         return Lineup.get_and_update_for_team(this)
     }
 
+    /**
+     * 
+     */
     async players() {
         const Player = this.models.get('Player')
         return Player.find({
@@ -64,6 +70,9 @@ class Team extends Model {
         })
     }
 
+    /**
+     * updates the API's data
+     */
     async to_api() {
         const User = this.models.get('auth:User')
 
