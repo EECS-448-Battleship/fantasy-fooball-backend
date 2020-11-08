@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/src/components/pages/League.component.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/src/components/pages/League.component.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {Component} from '../../../lib/vues6.js'
+import {GridCellRenderType} from '../Grid.component.js'
+import {api} from '../../module/api.js'
+
+const template = `
+&lt;div class="page-league">
+  &lt;div class="header">
+    &lt;div class="left">
+      &lt;h2>League Standings&lt;/h2>
+    &lt;/div>
+  &lt;/div>
+    &lt;app-grid
+        :column_defs="column_defs"
+        :data="data"
+        :show_row_numbers="false"
+    >&lt;/app-grid>
+&lt;/div>
+`
+
+/**
+ * Component representing the league standings page.
+ * @extends Component
+ */
+class LeagueComponent extends Component {
+    static get selector() { return 'page-league' }
+    static get template() { return template }
+    static get props() { return [] }
+
+    GridCellRenderType = GridCellRenderType
+
+    /**
+     * Column definitions for the league standings grid.
+     * @type {object[]}
+     */
+    column_defs = [
+        {
+            header: 'Standing',
+            type: GridCellRenderType.HTML,
+            key: 'standing',
+            renderer: (value, row) => {
+                return `
+                    &lt;h1 id="ranking">
+                    Rank: ${row.standing.rank}
+                    &lt;/h1>
+                    &lt;h2 id="record">
+                        W/L: ${row.standing.win_loss}
+                    &lt;/h2>
+                `
+
+            }
+        },
+        {
+            header: 'Team',
+            type: GridCellRenderType.HTML,
+            key: 'team_name',
+            renderer: (value, row) => {
+                return `
+                    &lt;div class="center">
+&lt;!--                        &lt;img src="${row.team_image}" alt="${row.team_image}" width="100">-->
+                        &lt;span>${row.team_name}&lt;/span>
+                    &lt;/div>
+                `
+            },
+        },
+        {
+            header: 'Stats',
+            key: 'stats',
+            type: GridCellRenderType.HTML,
+            renderer: (value, row) => {
+                const stats = []
+                for ( const stat of value ) {
+                    stats.push(`
+                        &lt;div class="stat">
+                            &lt;div class="title">${stat.name}&lt;/div>
+                            &lt;div>${stat.value}&lt;/div>
+                        &lt;/div>
+                    `)
+                }
+
+                return `
+                    &lt;div class="stats">
+                        ${stats.join('\n')}
+                    &lt;/div>
+                `
+            },
+        },
+    ]
+
+    /**
+     * Sample data for the league standings grid.
+     * @type {object[]}
+     */
+    data = []
+
+    /**
+     * Called when the component is instantiated.
+     * @return {Promise&lt;void>}
+     */
+    async vue_on_create() {
+        this.data = await api.get_standings()
+    }
+}
+
+export default LeagueComponent
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-fake_data.html">fake_data</a></li><li><a href="module-routing.html">routing</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="ActiveScope.html">ActiveScope</a></li><li><a href="AddPlayersComponent.html">AddPlayersComponent</a></li><li><a href="DraftBoard.html">DraftBoard</a></li><li><a href="DraftBoardComponent.html">DraftBoardComponent</a></li><li><a href="FrontendUnit.html">FrontendUnit</a></li><li><a href="GenerateMatchupsForWeekPatch.html">GenerateMatchupsForWeekPatch</a></li><li><a href="GenerateWeeklyResultsPatch.html">GenerateWeeklyResultsPatch</a></li><li><a href="GridActionButtonComponent.html">GridActionButtonComponent</a></li><li><a href="GridComponent.html">GridComponent</a></li><li><a href="Home.html">Home</a></li><li><a href="InjectUserTeam.html">InjectUserTeam</a></li><li><a href="LeagueComponent.html">LeagueComponent</a></li><li><a href="Lineup.html">Lineup</a></li><li><a href="LinkComponent.html">LinkComponent</a></li><li><a href="Matchup.html">Matchup</a></li><li><a href="module-routing-Router.html">Router</a></li><li><a href="MyTeamComponent.html">MyTeamComponent</a></li><li><a href="Player.html">Player</a></li><li><a href="ScoresComponent.html">ScoresComponent</a></li><li><a href="ScoresController.html">ScoresController</a></li><li><a href="SeedAPIDataPatch.html">SeedAPIDataPatch</a></li><li><a href="SeedWeeklyPlayerDataPatch.html">SeedWeeklyPlayerDataPatch</a></li><li><a href="SportsDataService.html">SportsDataService</a></li><li><a href="Team.html">Team</a></li><li><a href="Teams.html">Teams</a></li><li><a href="TopLevelComponent.html">TopLevelComponent</a></li><li><a href="User.html">User</a></li><li><a href="WeeklyPlayerStat.html">WeeklyPlayerStat</a></li><li><a href="WeeklyTeamStat.html">WeeklyTeamStat</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GridCellRenderType">GridCellRenderType</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Sun Nov 08 2020 14:34:32 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

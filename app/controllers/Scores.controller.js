@@ -17,8 +17,8 @@ class ScoresController extends Controller {
      * Returns the weekly scores
      * @param  req 
      * @param  res 
-     * @param  next 
-     * @returns
+     * @param  next
+     * @returns Promise<void>
      */
     async get_weekly_scores(req, res, next) {
         const Matchup = this.models.get('Matchup')

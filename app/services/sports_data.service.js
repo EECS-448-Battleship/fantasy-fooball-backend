@@ -59,7 +59,7 @@ class SportsDataService extends Service {
     /**
      * Fetches a list of player stats for all players in the league for the given week.
      * @param {number} week_num
-     * @return {Promise<Array<any>>>}
+     * @return {Promise<Array<any>>}
      */
     async get_week_player_stats(week_num) {
         return this.get_request(`PlayerGameProjectionStatsByWeek/${this.configs.get('server.sports_data.season')}/${week_num}`, 'projections')

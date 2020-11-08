@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: app/SeedAPIData.patch.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: app/SeedAPIData.patch.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { Injectable } = require('flitter-di')
+
+/**
+ * A one-time patch which populates the Player collection with
+ * all the players on all the active teams in the NFL using the
+ * sports data service's APIs.
+ *
+ * To run this, do it from "node flitter shell":
+ *
+ * @example
+ * Patch = require('./app/SeedAPIData.patch')
+ * patch = _di.make(Patch)
+ * await patch.run()
+ *
+ * @extends Injectable
+ */
+class SeedAPIDataPatch extends Injectable {
+    static get services() {
+        return [...super.services, 'models', 'sports_data', 'output']
+    }
+
+    /**
+     * Run the patch.
+     * @return {Promise&lt;void>}
+     */
+    async run() {
+        // Clear any existing data first
+        const Player = this.models.get('Player')
+        await Player.deleteMany()
+        this.output.success('Cleared existing player data!')
+
+        // Fetch all active teams
+        this.output.info('Fetching teams to patch data...')
+        const teams = await this.sports_data.get_active_teams()
+        this.output.info(`Fetched ${teams.length} teams.`)
+        let players = 0
+
+        // Fetch the players for each of the teams
+        for ( let i = 0; i &lt; teams.length; i++ ) {
+            const team = teams[i]
+            this.output.info(`Fetching players for team ${i + 1} of ${teams.length} (${team.Key})...`)
+
+            const team_players = await this.sports_data.get_team_players(team.Key)
+            this.output.info(`    (patching ${team_players.length} players)`)
+
+            // Insert Player documents for each of the player records
+            for ( const rec of team_players ) {
+                const player = Player.from_patch_data(rec)
+                player.patch_data.patch_team_name = team.FullName
+                player.patch_data.patch_team_key = team.Key
+                await player.save()
+                players += 1
+            }
+
+            this.output.success(`    (patched player data)`)
+        }
+
+        this.output.success(`Patch complete. Created ${players} players.`)
+    }
+}
+
+module.exports = exports = SeedAPIDataPatch
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-fake_data.html">fake_data</a></li><li><a href="module-routing.html">routing</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="ActiveScope.html">ActiveScope</a></li><li><a href="AddPlayersComponent.html">AddPlayersComponent</a></li><li><a href="DraftBoard.html">DraftBoard</a></li><li><a href="DraftBoardComponent.html">DraftBoardComponent</a></li><li><a href="FrontendUnit.html">FrontendUnit</a></li><li><a href="GenerateMatchupsForWeekPatch.html">GenerateMatchupsForWeekPatch</a></li><li><a href="GenerateWeeklyResultsPatch.html">GenerateWeeklyResultsPatch</a></li><li><a href="GridActionButtonComponent.html">GridActionButtonComponent</a></li><li><a href="GridComponent.html">GridComponent</a></li><li><a href="Home.html">Home</a></li><li><a href="InjectUserTeam.html">InjectUserTeam</a></li><li><a href="LeagueComponent.html">LeagueComponent</a></li><li><a href="Lineup.html">Lineup</a></li><li><a href="LinkComponent.html">LinkComponent</a></li><li><a href="Matchup.html">Matchup</a></li><li><a href="module-routing-Router.html">Router</a></li><li><a href="MyTeamComponent.html">MyTeamComponent</a></li><li><a href="Player.html">Player</a></li><li><a href="ScoresComponent.html">ScoresComponent</a></li><li><a href="ScoresController.html">ScoresController</a></li><li><a href="SeedAPIDataPatch.html">SeedAPIDataPatch</a></li><li><a href="SeedWeeklyPlayerDataPatch.html">SeedWeeklyPlayerDataPatch</a></li><li><a href="SportsDataService.html">SportsDataService</a></li><li><a href="Team.html">Team</a></li><li><a href="Teams.html">Teams</a></li><li><a href="TopLevelComponent.html">TopLevelComponent</a></li><li><a href="User.html">User</a></li><li><a href="WeeklyPlayerStat.html">WeeklyPlayerStat</a></li><li><a href="WeeklyTeamStat.html">WeeklyTeamStat</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GridCellRenderType">GridCellRenderType</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Sun Nov 08 2020 14:34:32 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

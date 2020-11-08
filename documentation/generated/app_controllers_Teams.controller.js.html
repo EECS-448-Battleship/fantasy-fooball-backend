@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: app/controllers/Teams.controller.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: app/controllers/Teams.controller.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { Controller } = require('libflitter')
+
+/**
+ * Teams Controller
+ * -------------------------------------------------------------
+ * This controller contains logic related to viewing and managing
+ * the user's team, team lineups, and team players.
+ *
+ * @extends Controller
+ */
+class Teams extends Controller {
+    static get services() {
+        return [...super.services, 'models']
+    }
+
+    /**
+     * Save changes to the current user's team and return it as API data.
+     * @param req
+     * @param res
+     * @param next
+     * @return {Promise&lt;*>}
+     */
+    async save_my_team(req, res, next) {
+        req.user_team.team_name = String(req.body.team_name).trim()
+        await req.user_team.save()
+        return res.api(await req.user_team.to_api())
+    }
+
+    /**
+     * Return the API data for the current user's team.
+     * Requires an authenticated user.
+     * @param req
+     * @param res
+     * @param next
+     * @return {Promise&lt;void>}
+     */
+    async get_my_team(req, res, next) {
+        return res.api(await req.user_team.to_api())
+    }
+
+    /**
+     * Return the API data for the players on the current user's team.
+     * @param req
+     * @param res
+     * @param next
+     * @return {Promise&lt;*>}
+     */
+    async get_my_team_players(req, res, next) {
+        const players = await req.user_team.players()
+        return res.api(await Promise.all(players.map(x => x.to_api(true))))
+    }
+
+    /**
+     * Return the API data for the current lineup for the current user's team.
+     * @param req
+     * @param res
+     * @param next
+     * @return {Promise&lt;*>}
+     */
+    async get_my_team_current_lineup(req, res, next) {
+        const lineup = await req.user_team.lineup()
+        return res.api(await lineup.to_api())
+    }
+
+    /**
+     * Saves the lineup for the current user's team and returns it as API data.
+     * @param req
+     * @param res
+     * @param next
+     * @return {Promise&lt;void>}
+     */
+    async save_my_team_lineup(req, res, next) {
+        if ( !Array.isArray(req.body.starting_players) ) {
+            return res.status(400)
+                .message('Missing required field: starting_players')
+                .api()
+        }
+
+        if ( !Array.isArray(req.body.benched_players) ) {
+            return res.status(400)
+                .message('Missing required field: benched_players')
+                .api()
+        }
+
+        // fetch the team players &amp; the current lineup
+        const player_ids = (await req.user_team.players()).map(x => x.id)
+        const lineup = await req.user_team.lineup()
+        lineup.clear_lineup()
+
+        // Add all the starting players to the lineup
+        for ( const player of req.body.starting_players ) {
+            if ( !player.id || !player.position ) continue;
+
+            const lineup_record = {
+                player_id: player.id,
+                position: player.position,
+            }
+
+            // Don't allow adding other teams' players to the lineup
+            if ( !player_ids.includes(lineup_record.player_id) ) {
+                return res.status(400)
+                    .message(`Sorry, the player ${lineup_record.player_id} is not on your team.`)
+                    .api()
+            }
+
+            lineup.start_player(lineup_record)
+        }
+
+        // Bench all the other players
+        for ( const player of req.body.benched_players ) {
+            if ( !player.id ) continue;
+
+            if ( !player_ids.includes(player.id) ) {
+                return res.status(400)
+                    .message(`Sorry, the player ${player.id} is not on your team.`)
+                    .api()
+            }
+
+            lineup.bench_player(player)
+        }
+
+        // Save the partial lineup
+        await lineup.save()
+
+        // Fetch a fresh version to fill in any missing players
+        const corrected_lineup = await req.user_team.lineup()
+
+        return res.api(await corrected_lineup.to_api())
+    }
+
+    /**
+     * Return the API data for a list of all teams.
+     * @param req
+     * @param res
+     * @return {Promise&lt;*>}
+     */
+    async list_all_teams(req, res) {
+        const TeamModel = this.models.get('Team')
+        const teams = await TeamModel.find()
+        return res.api(teams)
+    }
+
+    /**
+     * API endpoint for creating a new team.
+     * @todo remove this - happens automatically per-user
+     * @param req
+     * @param res
+     * @return {Promise&lt;*>}
+     */
+    async create_team(req, res) {
+        const TeamModel = this.models.get('Team')
+
+        if ( !req.body.team_name || !req.body.team_num ) {
+            return res.status(400)
+                .message('Missing team_name or team_num')
+                .api()
+        }
+
+        const duplicate_team = await TeamModel.findOne({
+            team_num: req.body.team_num,
+        })
+
+        if ( duplicate_team ) {
+            return res.status(400)
+                .message('That team number is already in use!')
+                .api()
+        }
+
+        const team = new TeamModel({
+            team_name: req.body.team_name,
+            team_num: req.body.team_num,
+        })
+
+        await team.save()
+        return res.api(team)
+    }
+}
+
+module.exports = Teams
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-fake_data.html">fake_data</a></li><li><a href="module-routing.html">routing</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="ActiveScope.html">ActiveScope</a></li><li><a href="AddPlayersComponent.html">AddPlayersComponent</a></li><li><a href="DraftBoard.html">DraftBoard</a></li><li><a href="DraftBoardComponent.html">DraftBoardComponent</a></li><li><a href="FrontendUnit.html">FrontendUnit</a></li><li><a href="GenerateMatchupsForWeekPatch.html">GenerateMatchupsForWeekPatch</a></li><li><a href="GenerateWeeklyResultsPatch.html">GenerateWeeklyResultsPatch</a></li><li><a href="GridActionButtonComponent.html">GridActionButtonComponent</a></li><li><a href="GridComponent.html">GridComponent</a></li><li><a href="Home.html">Home</a></li><li><a href="InjectUserTeam.html">InjectUserTeam</a></li><li><a href="LeagueComponent.html">LeagueComponent</a></li><li><a href="Lineup.html">Lineup</a></li><li><a href="LinkComponent.html">LinkComponent</a></li><li><a href="Matchup.html">Matchup</a></li><li><a href="module-routing-Router.html">Router</a></li><li><a href="MyTeamComponent.html">MyTeamComponent</a></li><li><a href="Player.html">Player</a></li><li><a href="ScoresComponent.html">ScoresComponent</a></li><li><a href="ScoresController.html">ScoresController</a></li><li><a href="SeedAPIDataPatch.html">SeedAPIDataPatch</a></li><li><a href="SeedWeeklyPlayerDataPatch.html">SeedWeeklyPlayerDataPatch</a></li><li><a href="SportsDataService.html">SportsDataService</a></li><li><a href="Team.html">Team</a></li><li><a href="Teams.html">Teams</a></li><li><a href="TopLevelComponent.html">TopLevelComponent</a></li><li><a href="User.html">User</a></li><li><a href="WeeklyPlayerStat.html">WeeklyPlayerStat</a></li><li><a href="WeeklyTeamStat.html">WeeklyTeamStat</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GridCellRenderType">GridCellRenderType</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Sun Nov 08 2020 14:34:32 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: app/services/sports_data.service.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: app/services/sports_data.service.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { Service } = require('flitter-di')
+const axios = require('axios').default;
+
+/**
+ * A service class for interacting with data from the SportsDataIO API.
+ * @extends Service
+ */
+class SportsDataService extends Service {
+    static get services() {
+        return [...super.services, 'configs', 'models', 'utility']
+    }
+
+    /**
+     * Resolves true if the game is currently in the draft stage.
+     * @return {Promise&lt;boolean>}
+     */
+    async is_draft_stage() {
+        const Setting = this.models.get('models::setting')
+        return this.utility.infer(await Setting.get('in_draft_stage'))
+    }
+
+    /**
+     * Resolves to the current week number of gameplay.
+     * @return {Promise&lt;number>}
+     */
+    async current_play_week() {
+        const Setting = this.models.get('models::setting')
+        return this.utility.infer(await Setting.get('current_week'))
+    }
+
+    /**
+     * Fetches a list of all players on the given team from the sports data API.
+     * @param {string} team_key
+     * @return {Promise&lt;Array&lt;any>>}
+     */
+    async get_team_players(team_key) {
+        return this.get_request(`Players/${team_key}`)
+    }
+
+    /**
+     * Fetches a list of all active teams from the sports data API.
+     * @return {Promise&lt;Array&lt;any>>}
+     */
+    async get_active_teams() {
+        return this.get_request('Teams')
+    }
+
+    /**
+     * Make a get request to the sports data API.
+     * @param {string} path
+     * @param {string} [base = 'scores'] - the API domain (scores, projections, &amp;c.)
+     * @return {Promise&lt;any>}
+     */
+    async get_request(path, base = 'scores') {
+        const response = await axios.get(this.url(path, base))
+        return response.data
+    }
+
+    /**
+     * Fetches a list of player stats for all players in the league for the given week.
+     * @param {number} week_num
+     * @return {Promise&lt;Array&lt;any>>}
+     */
+    async get_week_player_stats(week_num) {
+        return this.get_request(`PlayerGameProjectionStatsByWeek/${this.configs.get('server.sports_data.season')}/${week_num}`, 'projections')
+    }
+
+    /**
+     * Resolve an endpoint and an API domain to a fully-qualified URL to the sports data API.
+     * @param {string} path
+     * @param {string} [base = 'scores'] - the API domain (scores, projections, &amp;c.)
+     * @return {string}
+     */
+    url(path, base = 'scores') {
+        if ( path.startsWith('/') ) path = path.slice(1)
+        return `https://api.sportsdata.io/v3/nfl/${base}/json/${path}?key=${this.configs.get('server.sports_data.api_key')}`
+    }
+}
+
+module.exports = exports = SportsDataService
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-fake_data.html">fake_data</a></li><li><a href="module-routing.html">routing</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="ActiveScope.html">ActiveScope</a></li><li><a href="AddPlayersComponent.html">AddPlayersComponent</a></li><li><a href="DraftBoard.html">DraftBoard</a></li><li><a href="DraftBoardComponent.html">DraftBoardComponent</a></li><li><a href="FrontendUnit.html">FrontendUnit</a></li><li><a href="GenerateMatchupsForWeekPatch.html">GenerateMatchupsForWeekPatch</a></li><li><a href="GenerateWeeklyResultsPatch.html">GenerateWeeklyResultsPatch</a></li><li><a href="GridActionButtonComponent.html">GridActionButtonComponent</a></li><li><a href="GridComponent.html">GridComponent</a></li><li><a href="Home.html">Home</a></li><li><a href="InjectUserTeam.html">InjectUserTeam</a></li><li><a href="LeagueComponent.html">LeagueComponent</a></li><li><a href="Lineup.html">Lineup</a></li><li><a href="LinkComponent.html">LinkComponent</a></li><li><a href="Matchup.html">Matchup</a></li><li><a href="module-routing-Router.html">Router</a></li><li><a href="MyTeamComponent.html">MyTeamComponent</a></li><li><a href="Player.html">Player</a></li><li><a href="ScoresComponent.html">ScoresComponent</a></li><li><a href="ScoresController.html">ScoresController</a></li><li><a href="SeedAPIDataPatch.html">SeedAPIDataPatch</a></li><li><a href="SeedWeeklyPlayerDataPatch.html">SeedWeeklyPlayerDataPatch</a></li><li><a href="SportsDataService.html">SportsDataService</a></li><li><a href="Team.html">Team</a></li><li><a href="Teams.html">Teams</a></li><li><a href="TopLevelComponent.html">TopLevelComponent</a></li><li><a href="User.html">User</a></li><li><a href="WeeklyPlayerStat.html">WeeklyPlayerStat</a></li><li><a href="WeeklyTeamStat.html">WeeklyTeamStat</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GridCellRenderType">GridCellRenderType</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Sun Nov 08 2020 14:34:32 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

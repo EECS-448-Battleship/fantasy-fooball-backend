@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: app/models/Matchup.model.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: app/models/Matchup.model.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { Model } = require('flitter-orm')
+/**
+ * Matchup
+ * ---------------------------------------------------------------------------
+ * A model representing a single scheduled match-up between two teams.
+ *
+ * @extends Model
+ */
+class Matchup extends Model {
+    static get services() {
+        return [...super.services, 'models']
+    }
+
+    /**
+     * define the schema of the model
+     */
+    static get schema() {
+        return {
+            home_team_id: String,
+            visitor_team_id: String,
+            week_num: Number,
+            complete: { type: Boolean, default: false },
+            home_team_score: Number,
+            visitor_team_score: Number,
+        }
+    }
+
+    /**
+     * @returns the data of the home team
+     */
+    async home_team() {
+        const Team = this.models.get('Team')
+        return Team.findById(this.home_team_id)
+    }
+
+    /**
+     * @returns the data of the visitor team
+     */
+    async visitor_team() {
+        const Team = this.models.get('Team')
+        return Team.findById(this.visitor_team_id)
+    }
+
+    /**
+     * Format this matchup to be compatible with the API output.
+     * @returns Promise&lt;object>
+     */
+    async to_api() {
+        const home_team = await this.home_team()
+        const visitor_team = await this.visitor_team()
+
+        const data = {
+            date: '2020-11-11', // TODO generate this in the matches patch
+            team_1: home_team.team_name,
+            team_1_projection: await (await home_team.lineup())?.calculate_fantasy_points() + Math.round(Math.random() * (2 - (-2)) + (-2)),
+
+            team_2: visitor_team.team_name,
+            team_2_projection: await (await visitor_team.lineup())?.calculate_fantasy_points() + Math.round(Math.random() * (2 - (-2)) + (-2)),
+        }
+
+        if ( data.team_1_projection &lt; 0 ) data.team_1_projection = 0
+        if ( data.team_2_projection &lt; 0 ) data.team_2_projection = 0
+
+        if ( this.complete ) {
+            const winner = this.home_team_score > this.visitor_team_score ? home_team : visitor_team
+
+            data.winner = winner.team_name
+            data.winner_score = Math.max(this.home_team_score, this.visitor_team_score)
+            data.loser_score = Math.min(this.home_team_score, this.visitor_team_score)
+        }
+
+        return data
+    }
+}
+
+module.exports = exports = Matchup
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-fake_data.html">fake_data</a></li><li><a href="module-routing.html">routing</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="ActiveScope.html">ActiveScope</a></li><li><a href="AddPlayersComponent.html">AddPlayersComponent</a></li><li><a href="DraftBoard.html">DraftBoard</a></li><li><a href="DraftBoardComponent.html">DraftBoardComponent</a></li><li><a href="FrontendUnit.html">FrontendUnit</a></li><li><a href="GenerateMatchupsForWeekPatch.html">GenerateMatchupsForWeekPatch</a></li><li><a href="GenerateWeeklyResultsPatch.html">GenerateWeeklyResultsPatch</a></li><li><a href="GridActionButtonComponent.html">GridActionButtonComponent</a></li><li><a href="GridComponent.html">GridComponent</a></li><li><a href="Home.html">Home</a></li><li><a href="InjectUserTeam.html">InjectUserTeam</a></li><li><a href="LeagueComponent.html">LeagueComponent</a></li><li><a href="Lineup.html">Lineup</a></li><li><a href="LinkComponent.html">LinkComponent</a></li><li><a href="Matchup.html">Matchup</a></li><li><a href="module-routing-Router.html">Router</a></li><li><a href="MyTeamComponent.html">MyTeamComponent</a></li><li><a href="Player.html">Player</a></li><li><a href="ScoresComponent.html">ScoresComponent</a></li><li><a href="ScoresController.html">ScoresController</a></li><li><a href="SeedAPIDataPatch.html">SeedAPIDataPatch</a></li><li><a href="SeedWeeklyPlayerDataPatch.html">SeedWeeklyPlayerDataPatch</a></li><li><a href="SportsDataService.html">SportsDataService</a></li><li><a href="Team.html">Team</a></li><li><a href="Teams.html">Teams</a></li><li><a href="TopLevelComponent.html">TopLevelComponent</a></li><li><a href="User.html">User</a></li><li><a href="WeeklyPlayerStat.html">WeeklyPlayerStat</a></li><li><a href="WeeklyTeamStat.html">WeeklyTeamStat</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GridCellRenderType">GridCellRenderType</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Sun Nov 08 2020 14:34:32 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

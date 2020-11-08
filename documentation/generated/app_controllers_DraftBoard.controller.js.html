@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: app/controllers/DraftBoard.controller.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: app/controllers/DraftBoard.controller.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { Controller } = require('libflitter')
+/**
+ * DraftBoard controller
+ * ------------------------------------------------------------------------
+ * This controller contains logic for handling API requests related to fetching
+ * and drafting available players. Its methods should handle Express requests &amp;
+ * responses.
+ *
+ * @extends Controller
+ */
+class DraftBoard extends Controller {
+    static get services() {
+        return [...super.services, 'models']
+    }
+
+    /**
+     * Returns the API data containing the players available to draft
+     * @param  req 
+     * @param  res 
+     * @param  next 
+     * @returns Promise&lt;void>
+     */
+    async get_available_players(req, res, next) {
+        const Player = this.models.get('Player')
+        const players = await Player.get_unobligated_players()
+        const api_data = []
+
+        for ( const player of players ) {
+            api_data.push(await player.to_api())
+        }
+
+        return res.api(api_data)
+    }
+
+    /**
+     * adds the selected player to the team 
+     * @param  req 
+     * @param  res 
+     * @param  next
+     * @returns Promise&lt;void>
+     */
+    async draft_player_to_team(req, res, next) {
+        if ( !req.body.player_id ) {
+            return res.status(400)
+                .message('Missing required field: player_id')
+                .api()
+        }
+
+        // look up the player specified in the request
+        const Player = this.models.get('Player')
+        const player = await Player.findById(req.body.player_id)
+        if ( !player ) {
+            return res.status(400)
+                .message('A player with that ID cannot be found.')
+                .api()
+        }
+
+        // Don't allow drafting already-drafted players
+        if ( await player.is_obligated() ) {
+            return res.status(400)
+                .message('This player has already been drafted.')
+                .api()
+        }
+
+        req.user_team.player_ids.push(player.id)
+        await req.user_team.save()
+        return res.api()
+    }
+}
+
+module.exports = exports = DraftBoard
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-fake_data.html">fake_data</a></li><li><a href="module-routing.html">routing</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="ActiveScope.html">ActiveScope</a></li><li><a href="AddPlayersComponent.html">AddPlayersComponent</a></li><li><a href="DraftBoard.html">DraftBoard</a></li><li><a href="DraftBoardComponent.html">DraftBoardComponent</a></li><li><a href="FrontendUnit.html">FrontendUnit</a></li><li><a href="GenerateMatchupsForWeekPatch.html">GenerateMatchupsForWeekPatch</a></li><li><a href="GenerateWeeklyResultsPatch.html">GenerateWeeklyResultsPatch</a></li><li><a href="GridActionButtonComponent.html">GridActionButtonComponent</a></li><li><a href="GridComponent.html">GridComponent</a></li><li><a href="Home.html">Home</a></li><li><a href="InjectUserTeam.html">InjectUserTeam</a></li><li><a href="LeagueComponent.html">LeagueComponent</a></li><li><a href="Lineup.html">Lineup</a></li><li><a href="LinkComponent.html">LinkComponent</a></li><li><a href="Matchup.html">Matchup</a></li><li><a href="module-routing-Router.html">Router</a></li><li><a href="MyTeamComponent.html">MyTeamComponent</a></li><li><a href="Player.html">Player</a></li><li><a href="ScoresComponent.html">ScoresComponent</a></li><li><a href="ScoresController.html">ScoresController</a></li><li><a href="SeedAPIDataPatch.html">SeedAPIDataPatch</a></li><li><a href="SeedWeeklyPlayerDataPatch.html">SeedWeeklyPlayerDataPatch</a></li><li><a href="SportsDataService.html">SportsDataService</a></li><li><a href="Team.html">Team</a></li><li><a href="Teams.html">Teams</a></li><li><a href="TopLevelComponent.html">TopLevelComponent</a></li><li><a href="User.html">User</a></li><li><a href="WeeklyPlayerStat.html">WeeklyPlayerStat</a></li><li><a href="WeeklyTeamStat.html">WeeklyTeamStat</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GridCellRenderType">GridCellRenderType</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Sun Nov 08 2020 14:34:32 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

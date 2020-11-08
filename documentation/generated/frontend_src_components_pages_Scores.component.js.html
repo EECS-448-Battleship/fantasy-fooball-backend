@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/src/components/pages/Scores.component.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/src/components/pages/Scores.component.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {Component} from '../../../lib/vues6.js'
+import {GridCellRenderType} from '../Grid.component.js'
+import {api} from '../../module/api.js'
+
+const template = `
+&lt;div class="page-scores">
+    &lt;div class="header">
+        &lt;div class="left">
+            &lt;h2>Matchups &amp; Scores - &lt;small>Week {{ current_week }}&lt;/small>&lt;/h2>
+        &lt;/div>
+        &lt;div class="right" v-if="week_x_data.length > 1">
+            &lt;button :class="{ 'disable-click': current_week === max_week }" @click="to_next_week()">Next Week&lt;/button>&lt;button :class="{ 'disable-click': current_week === min_week }" @click="to_previous_week()">Previous Week&lt;/button>
+        &lt;/div>
+    &lt;/div>
+    &lt;app-grid
+        :column_defs="column_defs"
+        :data="data"
+        :show_row_numbers="false"
+    >&lt;/app-grid>
+&lt;/div>
+`
+
+/**
+ * Component representing the scores &amp; match-ups page.
+ * @extends Component
+ */
+class ScoresComponent extends Component {
+    static get selector() { return 'page-scores' }
+    static get template() { return template }
+    static get props() { return [] }
+
+    /**
+     * The number of the current week shown in the interface
+     * @type {number}
+     */
+    current_week = 1
+
+    /**
+     * Most recent week number.
+     * @type {number}
+     */
+    max_week = 1
+
+    /**
+     * Least recent week number.
+     * @type {number}
+     */
+    min_week = 1
+
+    /**
+     * Array of arrays of data for each week with first item being week 1, second being week 2, &amp;c.
+     * @type {object[][]}
+     */
+    week_x_data = []
+
+    /**
+     * Column definitions for the matchups grid.
+     * @type {object[]}
+     */
+    column_defs = [
+        {
+            header: 'Date',
+            type: GridCellRenderType.HTML,
+            key: 'date',
+            renderer: (_, data) => {
+                return `${data.date} @ ${data.team_1}`
+            }
+        },
+        {
+            header: 'Team 1',
+            type: GridCellRenderType.HTML,
+            key: 'team_1',
+            renderer: (_, data) => `
+                &lt;div style="display: flex; flex-direction: row;">
+&lt;!--                    &lt;img src="${data.team_1_logo}" alt="${data.team_1}">-->
+                    &lt;div style="margin-left: 20px">
+                        &lt;b>${data.team_1}&lt;/b>
+                        &lt;p>Projection: ${data.team_1_projection}&lt;/p>
+                    &lt;/div>
+                &lt;/div>
+            `
+        },
+        {
+            header: 'Team 2',
+            type: GridCellRenderType.HTML,
+            key: 'team_2',
+            renderer: (_, data) => `
+                &lt;div style="display: flex; flex-direction: row;">
+&lt;!--                    &lt;img src="${data.team_2_logo}" alt="${data.team_2}">-->
+                    &lt;div style="margin-left: 20px">
+                        &lt;b>${data.team_2}&lt;/b>
+                        &lt;p>Projection: ${data.team_2_projection}&lt;/p>
+                    &lt;/div>
+                &lt;/div>
+            `
+        },
+        {
+            header: 'Outcome',
+            type: GridCellRenderType.HTML,
+            key: 'winner',
+            renderer: (_, data) => {
+                if ( data?.winner ) {
+                    return `
+                        &lt;div>&lt;b>Winner:&lt;/b> ${data.winner}&lt;/div>
+                        &lt;div>&lt;b>Score: &lt;/b> ${data.winner_score} / ${data.loser_score}&lt;/div>
+                    `
+                } else {
+                    return `N/A`
+                }
+            },
+        }
+    ]
+
+    /**
+     * The currently shown week's data.
+     * @type {object[]}
+     */
+    data = []
+
+    /**
+     * Called when the component is instantiated. Initializes the current week to the most recent week.
+     * @return {Promise&lt;void>}
+     */
+    async vue_on_create() {
+        this.week_x_data = await api.get_matchups()
+        this.max_week = this.current_week = this.week_x_data.length
+
+        this.data = this.week_x_data[this.max_week - 1];
+    }
+
+    /**
+     * When called, advances the data to the next-most recent week, if one exists.
+     */
+    to_next_week() {
+        if ( this.current_week &lt; this.max_week ) {
+            this.current_week += 1;
+            this.data = this.week_x_data[this.current_week - 1];
+        }
+    }
+
+    /**
+     * When called, advances the data to the next-least recent week, if one exists.
+     */
+    to_previous_week() {
+        if ( this.current_week > this.min_week ) {
+            this.current_week -= 1;
+            this.data = this.week_x_data[this.current_week - 1];
+        }
+    }
+}
+
+export default ScoresComponent
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-fake_data.html">fake_data</a></li><li><a href="module-routing.html">routing</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="ActiveScope.html">ActiveScope</a></li><li><a href="AddPlayersComponent.html">AddPlayersComponent</a></li><li><a href="DraftBoard.html">DraftBoard</a></li><li><a href="DraftBoardComponent.html">DraftBoardComponent</a></li><li><a href="FrontendUnit.html">FrontendUnit</a></li><li><a href="GenerateMatchupsForWeekPatch.html">GenerateMatchupsForWeekPatch</a></li><li><a href="GenerateWeeklyResultsPatch.html">GenerateWeeklyResultsPatch</a></li><li><a href="GridActionButtonComponent.html">GridActionButtonComponent</a></li><li><a href="GridComponent.html">GridComponent</a></li><li><a href="Home.html">Home</a></li><li><a href="InjectUserTeam.html">InjectUserTeam</a></li><li><a href="LeagueComponent.html">LeagueComponent</a></li><li><a href="Lineup.html">Lineup</a></li><li><a href="LinkComponent.html">LinkComponent</a></li><li><a href="Matchup.html">Matchup</a></li><li><a href="module-routing-Router.html">Router</a></li><li><a href="MyTeamComponent.html">MyTeamComponent</a></li><li><a href="Player.html">Player</a></li><li><a href="ScoresComponent.html">ScoresComponent</a></li><li><a href="ScoresController.html">ScoresController</a></li><li><a href="SeedAPIDataPatch.html">SeedAPIDataPatch</a></li><li><a href="SeedWeeklyPlayerDataPatch.html">SeedWeeklyPlayerDataPatch</a></li><li><a href="SportsDataService.html">SportsDataService</a></li><li><a href="Team.html">Team</a></li><li><a href="Teams.html">Teams</a></li><li><a href="TopLevelComponent.html">TopLevelComponent</a></li><li><a href="User.html">User</a></li><li><a href="WeeklyPlayerStat.html">WeeklyPlayerStat</a></li><li><a href="WeeklyTeamStat.html">WeeklyTeamStat</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GridCellRenderType">GridCellRenderType</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Sun Nov 08 2020 14:34:32 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

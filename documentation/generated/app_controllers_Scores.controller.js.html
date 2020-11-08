@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: app/controllers/Scores.controller.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: app/controllers/Scores.controller.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { Controller } = require('libflitter')
+
+/**
+ * ScoresController
+ * ----------------------------------------------------------------------
+ * This controller contains logic for handling API requests related to the
+ * weekly scores and matchups endpoints.
+ *
+ * @extends Controller
+ */
+class ScoresController extends Controller {
+    static get services() {
+        return [...super.services, 'models', 'sports_data']
+    }
+
+    /**
+     * Returns the weekly scores
+     * @param  req 
+     * @param  res 
+     * @param  next
+     * @returns Promise&lt;void>
+     */
+    async get_weekly_scores(req, res, next) {
+        const Matchup = this.models.get('Matchup')
+
+        const current_week = await this.sports_data.current_play_week()
+        const weekly_data = []
+
+        // Convert all of the matchup instances to API format for each week
+        for ( let i = 1; i &lt;= current_week; i += 1 ) {
+            const matchups = await Matchup.find({ week_num: i })
+            const api_data = await Promise.all(matchups.map(x => x.to_api()))
+            weekly_data.push(api_data)
+        }
+
+        return res.api(weekly_data)
+    }
+
+    /**
+     * Returns the league standings with calculated stats
+     * @param req
+     * @param res
+     * @param next
+     * @return {Promise&lt;Array&lt;object>>}
+     */
+    async get_league_standings(req, res, next) {
+        const Team = this.models.get('Team')
+        const all_teams = await Team.find()
+        const stat_records = []
+
+        // Generate the cumulative team data for all teams
+        for ( const team of all_teams ) {
+            const rec = await team.cumulative_data()
+            rec.team_name = team.team_name
+            stat_records.push(rec)
+        }
+
+        // Sort the teams by number of wins, then number of points scored
+        stat_records.sort((a, b) => {
+            if ( a.wins === b.wins ) {
+                return a.points_scored - b.points_scored
+            }
+
+            return a.wins > b.wins ? 1 : -1
+        })
+
+        // Return the records in a format compatible with the front-end
+        return res.api(stat_records.map((x, i) => {
+            return {
+                standing: {
+                    rank: i + 1,
+                    win_loss: `${x.wins}/${x.losses}`,
+                },
+                team_name: x.team_name,
+                stats: [
+                    { name: 'Total Points Scored', value: x.points_scored },
+                    { name: 'Total Points Allowed', value: x.points_allowed },
+                ],
+            }
+        }))
+    }
+}
+
+module.exports = exports = ScoresController
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-fake_data.html">fake_data</a></li><li><a href="module-routing.html">routing</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="ActiveScope.html">ActiveScope</a></li><li><a href="AddPlayersComponent.html">AddPlayersComponent</a></li><li><a href="DraftBoard.html">DraftBoard</a></li><li><a href="DraftBoardComponent.html">DraftBoardComponent</a></li><li><a href="FrontendUnit.html">FrontendUnit</a></li><li><a href="GenerateMatchupsForWeekPatch.html">GenerateMatchupsForWeekPatch</a></li><li><a href="GenerateWeeklyResultsPatch.html">GenerateWeeklyResultsPatch</a></li><li><a href="GridActionButtonComponent.html">GridActionButtonComponent</a></li><li><a href="GridComponent.html">GridComponent</a></li><li><a href="Home.html">Home</a></li><li><a href="InjectUserTeam.html">InjectUserTeam</a></li><li><a href="LeagueComponent.html">LeagueComponent</a></li><li><a href="Lineup.html">Lineup</a></li><li><a href="LinkComponent.html">LinkComponent</a></li><li><a href="Matchup.html">Matchup</a></li><li><a href="module-routing-Router.html">Router</a></li><li><a href="MyTeamComponent.html">MyTeamComponent</a></li><li><a href="Player.html">Player</a></li><li><a href="ScoresComponent.html">ScoresComponent</a></li><li><a href="ScoresController.html">ScoresController</a></li><li><a href="SeedAPIDataPatch.html">SeedAPIDataPatch</a></li><li><a href="SeedWeeklyPlayerDataPatch.html">SeedWeeklyPlayerDataPatch</a></li><li><a href="SportsDataService.html">SportsDataService</a></li><li><a href="Team.html">Team</a></li><li><a href="Teams.html">Teams</a></li><li><a href="TopLevelComponent.html">TopLevelComponent</a></li><li><a href="User.html">User</a></li><li><a href="WeeklyPlayerStat.html">WeeklyPlayerStat</a></li><li><a href="WeeklyTeamStat.html">WeeklyTeamStat</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GridCellRenderType">GridCellRenderType</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Sun Nov 08 2020 14:34:32 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

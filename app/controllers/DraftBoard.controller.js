@@ -18,7 +18,7 @@ class DraftBoard extends Controller {
      * @param  req 
      * @param  res 
      * @param  next 
-     * @returns 
+     * @returns Promise<void>
      */
     async get_available_players(req, res, next) {
         const Player = this.models.get('Player')
@@ -36,8 +36,8 @@ class DraftBoard extends Controller {
      * adds the selected player to the team 
      * @param  req 
      * @param  res 
-     * @param  next 
-     * @returns
+     * @param  next
+     * @returns Promise<void>
      */
     async draft_player_to_team(req, res, next) {
         if ( !req.body.player_id ) {

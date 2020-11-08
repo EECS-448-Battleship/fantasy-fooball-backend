@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/src/components/pages/AddPlayers.component.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/src/components/pages/AddPlayers.component.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { Component } from '../../../lib/vues6.js'
+import { fake_players } from '../../module/fake_data.js'
+import { clone } from '../../module/util.js'
+import { api } from '../../module/api.js'
+
+const template = `
+&lt;div class="page-add-players">
+    &lt;div class="header">
+        &lt;div class="left">
+            &lt;h2>Add Players to Team&lt;/h2>
+        &lt;/div>
+        &lt;div class="right">
+            &lt;button :class="{ 'disable-click': my_team_only }" @click="to_my_team_only()">My Team&lt;/button>&lt;button :class="{ 'disable-click': !my_team_only }" @click="to_all_players()">All Players&lt;/button>
+        &lt;/div>
+        &lt;div class="right">
+            &lt;input type="text" placeholder="Quick filter..." v-model="quick_filter" @keyup="on_filter_change()">
+        &lt;/div>
+    &lt;/div>
+    &lt;div class="item-grid">
+        &lt;div class="item" v-for="player of filtered_players" @mouseover="on_photo_hover(player)"
+            @mouseleave="on_photo_leave(player)">
+            &lt;div style="display: flex; flex-direction: column; height: 100%;">
+                &lt;div class="item-icon" v-if="!player.showing_stats">
+                    &lt;img :src="player.image" :alt="player.name">
+                &lt;/div>
+                &lt;div class="item-contents" v-if="!player.showing_stats">
+                    &lt;h1>{{ player.name }}&lt;/h1>
+                    &lt;p>#{{ player.number }} ({{ player.position }})&lt;/p>
+                &lt;/div>
+                &lt;div class="item-contents" style="flex: 1;" v-else>
+                    &lt;div>
+                        &lt;p v-if="player.team_name">&lt;b>Team: &lt;/b> {{ player.team_name }}&lt;/p>
+                        &lt;p>&lt;b>Position: &lt;/b> {{ player.position }}&lt;/p>
+                        &lt;p v-for="(value, stat) in player.stats">&lt;b>{{ stat }}: &lt;/b> {{ value }}&lt;/p>
+                    &lt;/div>
+                &lt;/div>
+            &lt;/div>
+            &lt;div class="item-button">
+                &lt;button
+                    v-if="my_team.length &lt; 15 &amp;&amp; !my_team.includes(player)"
+                    @click="add_to_team(player)"
+                    class="add"
+                >Add to Team&lt;/button>
+                &lt;button
+                    v-if="my_team.includes(player)"
+                    @click="remove_from_team(player)"
+                    class="remove"
+                >Remove from Team&lt;/button>
+            &lt;/div>
+        &lt;/div>
+    &lt;/div>
+&lt;/div>
+`
+
+/**
+ * A component which represents the "Add Players" page. Allows users to add/remove
+ * players from their team.
+ * @extends Component
+ */
+class AddPlayersComponent extends Component {
+    static get selector() { return 'page-add-players' }
+    static get props() { return [] }
+    static get template() { return template }
+
+    /**
+     * The current value of the quick filter for players. If empty string, no filter is applied.
+     * @type {string}
+     */
+    quick_filter = ''
+
+    /**
+     * If true, then only the players on the user's team will be shown.
+     * @type {boolean}
+     */
+    my_team_only = false
+
+    /**
+     * Array of players currently on the user's team.
+     * @type {object[]}
+     */
+    my_team = []
+
+    /**
+     * Array of currently displayed players, after the filter has been applied.
+     * @type {object[]}
+     */
+    filtered_players = []
+
+    /**
+     * Array of currently displayed players, before the filter has been applied.
+     * @type {object[]}
+     */
+    possible_players = []
+
+    /**
+     * All available players, whether they are on the user's team or not.
+     * @type {object[]}
+     */
+    all_players = clone(fake_players)
+
+    /**
+     * Called when the page is instantiated.
+     * @return {Promise&lt;void>}
+     */
+    async vue_on_create() {
+        const available_players = await api.get_available_draft_players()
+        const team_players = await api.get_my_team_players()
+
+        this.all_players = this.possible_players = [...team_players, ...available_players].map(x => {
+            x.showing_stats = false;
+            return x;
+        });
+
+        this.my_team = [...team_players];
+        this.filtered_players = [...this.possible_players];
+    }
+
+    /**
+     * Called when the quick-filter changes. Applies the filter to the displayed players.
+     */
+    on_filter_change() {
+        const query = this.quick_filter.toLowerCase()
+        this.filtered_players = this.possible_players.filter(x => {
+            if (!query) return true;
+            return x.name.toLowerCase().includes(query) || x.position.toLowerCase().includes(query)
+        })
+    }
+
+    /**
+     * When called, change the display to show only the user's team.
+     */
+    to_my_team_only() {
+        this.my_team_only = true;
+        this.possible_players = [...this.my_team]
+        this.on_filter_change()
+    }
+
+    /**
+     * When called, change the display to show all available players.
+     */
+    to_all_players() {  
+        this.my_team_only = false;
+        this.possible_players = [...this.all_players]
+        this.on_filter_change()
+    }
+
+    /**
+     * Add the given player to the user's team, if not already there.
+     * @param {object} player
+     */
+    add_to_team(player) {
+        if (!this.my_team.includes(player)) {
+            this.my_team.push(player)
+        }
+    }
+
+    /**
+     * Remove the given player from the user's team, if there.
+     * @param {object} player
+     */
+    remove_from_team(player) {
+        this.my_team = this.my_team.filter(x => x !== player)
+        player.showing_stats = false
+        if (this.my_team_only) this.to_my_team_only()
+    }
+
+    /**
+     * Called when the user hovers over a player. Toggles the stats to be shown.
+     * @param {object} player
+     */
+    on_photo_hover(player) {
+        player.showing_stats = true
+    }
+
+    /**
+     * Called when the user un-hovers over a player. Toggles the stats to hide.
+     * @param {object} player
+     */
+    on_photo_leave(player) {
+        player.showing_stats = false
+    }
+}
+
+export default AddPlayersComponent
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-fake_data.html">fake_data</a></li><li><a href="module-routing.html">routing</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="ActiveScope.html">ActiveScope</a></li><li><a href="AddPlayersComponent.html">AddPlayersComponent</a></li><li><a href="DraftBoard.html">DraftBoard</a></li><li><a href="DraftBoardComponent.html">DraftBoardComponent</a></li><li><a href="FrontendUnit.html">FrontendUnit</a></li><li><a href="GenerateMatchupsForWeekPatch.html">GenerateMatchupsForWeekPatch</a></li><li><a href="GenerateWeeklyResultsPatch.html">GenerateWeeklyResultsPatch</a></li><li><a href="GridActionButtonComponent.html">GridActionButtonComponent</a></li><li><a href="GridComponent.html">GridComponent</a></li><li><a href="Home.html">Home</a></li><li><a href="InjectUserTeam.html">InjectUserTeam</a></li><li><a href="LeagueComponent.html">LeagueComponent</a></li><li><a href="Lineup.html">Lineup</a></li><li><a href="LinkComponent.html">LinkComponent</a></li><li><a href="Matchup.html">Matchup</a></li><li><a href="module-routing-Router.html">Router</a></li><li><a href="MyTeamComponent.html">MyTeamComponent</a></li><li><a href="Player.html">Player</a></li><li><a href="ScoresComponent.html">ScoresComponent</a></li><li><a href="ScoresController.html">ScoresController</a></li><li><a href="SeedAPIDataPatch.html">SeedAPIDataPatch</a></li><li><a href="SeedWeeklyPlayerDataPatch.html">SeedWeeklyPlayerDataPatch</a></li><li><a href="SportsDataService.html">SportsDataService</a></li><li><a href="Team.html">Team</a></li><li><a href="Teams.html">Teams</a></li><li><a href="TopLevelComponent.html">TopLevelComponent</a></li><li><a href="User.html">User</a></li><li><a href="WeeklyPlayerStat.html">WeeklyPlayerStat</a></li><li><a href="WeeklyTeamStat.html">WeeklyTeamStat</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GridCellRenderType">GridCellRenderType</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Sun Nov 08 2020 14:34:32 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

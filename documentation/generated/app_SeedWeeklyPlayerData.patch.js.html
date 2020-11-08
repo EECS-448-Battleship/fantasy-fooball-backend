@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: app/SeedWeeklyPlayerData.patch.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: app/SeedWeeklyPlayerData.patch.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { Injectable } = require('flitter-di')
+
+/**
+ * A data patch which fetches all of the player stats for a range of
+ * weeks and creates WeeklyPlayerStat records for all players for all
+ * weeks.
+ *
+ * This builds the base of data we need to calculate the weekly team
+ * standings.
+ *
+ * @example
+ * P = require('./app/SeedWeeklyPlayerData.patch')
+ * p = _di.make(P)
+ * await p.run()
+ *
+ * @extends Injectable
+ */
+class SeedWeeklyPlayerDataPatch extends Injectable {
+    static get services() {
+        return [...super.services, 'models', 'sports_data', 'output']
+    }
+
+    /**
+     * Run the patch.
+     * @return {Promise&lt;void>}
+     */
+    async run() {
+        const Player = this.models.get('Player')
+        const WeeklyPlayerStat = this.models.get('WeeklyPlayerStat')
+        const start_week = 1
+        const end_week = 17
+
+        // Clear existing data
+        await WeeklyPlayerStat.deleteMany()
+
+        // Array of players with week 1 stats
+        const player_ids_with_week_1_stats = []
+
+        // Populate the weekly player stats for all weeks in the range
+        for ( let week = start_week; week &lt;= end_week; week += 1 ) {
+            this.output.info(`Building weekly player stats for week ${week}...`)
+            const player_stats = await this.sports_data.get_week_player_stats(week)
+
+            this.output.info(`    - processing ${player_stats.length} stats`)
+            for ( const stat of player_stats ) {
+                const player = await Player.findOne({
+                    'patch_data.player_id': stat.PlayerID,
+                })
+
+                if ( player ) {
+                    const weekly_stat = new WeeklyPlayerStat({
+                        player_id: player.id,
+                        patch_player_id: stat.PlayerID,
+                        week_num: week,
+                        fantasy_points: stat.FantasyPoints,
+
+                        passing_attempts: stat.PassingAttempts,
+                        passing_completions: stat.PassingCompletions,
+                        passing_yards: stat.PassingYards,
+                        fumbles: stat.Fumbles,
+                        kick_returns: stat.KickReturns,
+                        sacks: stat.Sacks,
+                    })
+
+                    await weekly_stat.save()
+
+                    if ( week === 1 ) {
+                        player_ids_with_week_1_stats.push(player.id)
+                    }
+
+                    if ( week === 1 || !player.seed_stats || Object.values(player.seed_stats).length &lt; 1 ) {
+                        player.seed_stats = await weekly_stat.to_api()
+                    }
+                } else {
+                    this.output.warn(`      - Player ID ${stat.PlayerID} does not exist.`)
+                }
+            }
+            this.output.success(`    - complete`)
+        }
+
+        this.output.info('Deactivating players without week 1 stats...')
+        const inactive_players = await Player.find({
+            _id: {
+                $nin: player_ids_with_week_1_stats.map(x => Player.to_object_id(x)),
+            },
+        })
+
+        this.output.info(`Deactivating ${inactive_players.length} players...`)
+        for ( const player of inactive_players ) {
+            player.is_active = false
+            await player.save()
+        }
+
+        this.output.success('Complete!')
+    }
+}
+
+module.exports = exports = SeedWeeklyPlayerDataPatch
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-fake_data.html">fake_data</a></li><li><a href="module-routing.html">routing</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="ActiveScope.html">ActiveScope</a></li><li><a href="AddPlayersComponent.html">AddPlayersComponent</a></li><li><a href="DraftBoard.html">DraftBoard</a></li><li><a href="DraftBoardComponent.html">DraftBoardComponent</a></li><li><a href="FrontendUnit.html">FrontendUnit</a></li><li><a href="GenerateMatchupsForWeekPatch.html">GenerateMatchupsForWeekPatch</a></li><li><a href="GenerateWeeklyResultsPatch.html">GenerateWeeklyResultsPatch</a></li><li><a href="GridActionButtonComponent.html">GridActionButtonComponent</a></li><li><a href="GridComponent.html">GridComponent</a></li><li><a href="Home.html">Home</a></li><li><a href="InjectUserTeam.html">InjectUserTeam</a></li><li><a href="LeagueComponent.html">LeagueComponent</a></li><li><a href="Lineup.html">Lineup</a></li><li><a href="LinkComponent.html">LinkComponent</a></li><li><a href="Matchup.html">Matchup</a></li><li><a href="module-routing-Router.html">Router</a></li><li><a href="MyTeamComponent.html">MyTeamComponent</a></li><li><a href="Player.html">Player</a></li><li><a href="ScoresComponent.html">ScoresComponent</a></li><li><a href="ScoresController.html">ScoresController</a></li><li><a href="SeedAPIDataPatch.html">SeedAPIDataPatch</a></li><li><a href="SeedWeeklyPlayerDataPatch.html">SeedWeeklyPlayerDataPatch</a></li><li><a href="SportsDataService.html">SportsDataService</a></li><li><a href="Team.html">Team</a></li><li><a href="Teams.html">Teams</a></li><li><a href="TopLevelComponent.html">TopLevelComponent</a></li><li><a href="User.html">User</a></li><li><a href="WeeklyPlayerStat.html">WeeklyPlayerStat</a></li><li><a href="WeeklyTeamStat.html">WeeklyTeamStat</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GridCellRenderType">GridCellRenderType</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Sun Nov 08 2020 14:34:32 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

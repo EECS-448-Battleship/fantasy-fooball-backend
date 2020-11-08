@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/src/components/pages/MyTeam.component.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/src/components/pages/MyTeam.component.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {Component} from '../../../lib/vues6.js'
+import {GridCellRenderType} from '../Grid.component.js'
+import {api} from '../../module/api.js'
+
+const template = `
+&lt;div class="page-my-team">
+    &lt;div class="header">
+        &lt;div class="left team-name">
+            &lt;h2>My Team - &lt;/h2>&lt;input placeholder="Click to edit team name..." type="text" v-model="team_name">
+        &lt;/div>
+        &lt;div class="right">
+            &lt;span class="save-text" style="margin-right: 20px; color: #555555; font-style: italic;">{{ save_text }}&lt;/span>&lt;button @click="save_changes()">Save&lt;/button>
+        &lt;/div>
+    &lt;/div>
+    &lt;div class="body" style="display: flex; flex-direction: row; margin-left: 10px; padding-bottom: 50px;" v-if="show_body">
+        &lt;app-grid
+            :column_defs="overall_column_defs"
+            :data="overall_data"
+            :show_row_numbers="true"
+            style="flex: 1;"
+        >&lt;/app-grid>
+        &lt;div class="lineup-grids" style="margin-left: 30px; margin-right: 10px; flex: 1;">
+            &lt;h3>Starting Lineup&lt;/h3>
+            &lt;app-grid
+                :column_defs="lineup_column_defs"
+                :data="starting_players"
+                :show_row_numbers="false"
+            >&lt;/app-grid>
+
+            &lt;h3>Bench&lt;/h3>
+            &lt;app-grid
+                :column_defs="lineup_column_defs"
+                :data="bench_players"
+                :show_row_numbers="false"
+            >&lt;/app-grid>
+        &lt;/div>
+    &lt;/div>
+&lt;/div>
+`
+
+/**
+ * Component representing the my-team page.
+ * @extends Component
+ */
+class MyTeamComponent extends Component {
+    static get selector() { return 'page-my-team' }
+    static get template() { return template }
+    static get props() { return [] }
+
+    /**
+     * Original team name to compare against.
+     */
+    _original_team_name = ''
+
+    /**
+     * The team name.
+     * @type {string}
+     */
+    team_name = ''
+
+    /**
+     * The text next to the save button.
+     * @type {string}
+     */
+    save_text = 'All changes saved.'
+
+    /**
+     * If true, the body of the page will be shown. Otherwise, hidden.
+     * This is used to refresh the entire component at once.
+     * @type {boolean}
+     */
+    show_body = true
+
+    /**
+     * The player currently being moved. If none, then will be set to undefined.
+     * @type {undefined}
+     */
+    moving_player = undefined
+
+    /**
+     * Array of players filling starting line up positions. If no player is in
+     * a position, then only the "postition" key will be set.
+     * @type {object[]}
+     */
+    starting_players = []
+
+    /**
+     * Players on the bench.
+     * @type {object[]}
+     */
+    bench_players = []
+
+    /**
+     * Column definitions for the starting/bench lineup grids.
+     * @type {object[]}
+     */
+    lineup_column_defs = [
+        {
+            header: 'POS',
+            key: 'position',
+        },
+        {
+            header: 'Player',
+            key: 'name',
+            type: GridCellRenderType.HTML,
+            renderer: (_, data) => {
+                if ( !data.name ) {
+                    return `&lt;i style="color: darkgrey">none&lt;/i>`
+                } else {
+                    return `
+                        &lt;div class="center">
+                            &lt;img src="${data.image}" alt="${data.name}" height="50" style="border-radius: 50%">
+                            &lt;span>${data.name} (#${data.number})&lt;/span>
+                        &lt;/div>
+                    `
+                }
+            },
+        },
+        {
+            header: '',
+            key: 'name',
+            type: GridCellRenderType.Component,
+            component: Vue.component('app-action-button'),
+            button_color: (row, col) => this.moving_player ? '#CC5746' : '#0582CA',
+            button_text: (row, col) => {
+                return this.moving_player ? 'Here' : 'Move'
+            },
+            button_hidden: (row, col) => {
+                if ( this.moving_player &amp;&amp; this.moving_player.name !== row.name ) return false;
+                if ( !row.name ) return true;
+                return this.moving_player &amp;&amp; this.moving_player.name === row.name;
+            },
+            on_click: (row, col) => {
+                if ( !this.moving_player ) {
+                    this.moving_player = row;
+                } else {
+                    const old_row = {...row};
+                    const moved_row = {...this.moving_player};
+
+                    for ( const prop in moved_row ) {
+                        if ( prop === 'position' ) continue;
+                        row[prop] = moved_row[prop]
+                    }
+
+                    for ( const prop in moved_row ) {
+                        if ( prop === 'position' ) continue;
+                        this.moving_player[prop] = old_row[prop]
+                    }
+
+                    this.moving_player = undefined;
+                    this.$_vue_inst.mark_dirty();
+                }
+
+                this.$_vue_inst.update();  // $_vue_inst refers to the Vue.component instance, not the data class.
+            },
+        },
+    ]
+
+    /**
+     * Column definitions for the overall team grid.
+     * @type {object[]}
+     */
+    overall_column_defs = [
+        {
+            header: 'Name',
+            key: 'name',
+            type: GridCellRenderType.HTML,
+            renderer: (_, data) => `
+                &lt;div class="center">
+                    &lt;img src="${data.image}" alt="${data.name}" height="50" style="border-radius: 50%">
+                    &lt;span>${data.name} (#${data.number})&lt;/span>
+                &lt;/div>
+            `,
+        },
+        {
+            header: 'POS',
+            key: 'position',
+        },
+        {
+            header: 'ECR',
+            title: 'Expected Coverage Rating',
+            key: 'ecr',
+        },
+    ]
+
+    /**
+     * Data for the overall team grid (list of user's team players).
+     * @type {object[]}
+     */
+    overall_data = []
+
+    /**
+     * Called when the component is instantiated. Initializes the bench players data.
+     * @return {Promise&lt;void>}
+     */
+    async vue_on_create() {
+        console.log('api', api)
+        const [my_team, lineup] = await Promise.all([api.get_my_team(), api.get_my_team_current_lineup()])
+        this.team_name = this._original_team_name = my_team.team_name
+        this.overall_data = await api.get_my_team_players()
+        this.bench_players = lineup.benched_players
+        this.starting_players = lineup.starting_players
+
+        setTimeout(() => {
+            this.update();
+        }, 500);
+    }
+
+    /**
+     * Force re-render the entire component by briefly hiding it.
+     */
+    update() {
+        this.show_body = false;
+
+        this.$nextTick(() => {
+            this.show_body = true;
+        });
+    }
+
+    mark_dirty() {
+        this.save_text = 'Unsaved changes'
+    }
+
+    /**
+     * Fired when the team name changes. Marks the data as needing a save.
+     */
+    watch_team_name() {
+        if ( this.team_name !== this._original_team_name )
+            this.mark_dirty()
+    }
+
+    async save_changes() {
+        this.save_text = 'Saving changes...'
+
+        // Save the team name
+        const team_save_result = await api.save_my_team({ team_name: this.team_name })
+        this.team_name = this._original_team_name = team_save_result.team_name
+
+        // Save the lineup
+        const lineup_data = {
+            starting_players: this.starting_players,
+            benched_players: this.bench_players,
+        }
+
+        const lineup_save_result = await api.save_my_team_lineup(lineup_data)
+        this.bench_players = lineup_save_result.benched_players
+        this.starting_players = lineup_save_result.starting_players
+
+        this.save_text = 'All changes saved.'
+        this.update()
+    }
+}
+
+export default MyTeamComponent
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-fake_data.html">fake_data</a></li><li><a href="module-routing.html">routing</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="ActiveScope.html">ActiveScope</a></li><li><a href="AddPlayersComponent.html">AddPlayersComponent</a></li><li><a href="DraftBoard.html">DraftBoard</a></li><li><a href="DraftBoardComponent.html">DraftBoardComponent</a></li><li><a href="FrontendUnit.html">FrontendUnit</a></li><li><a href="GenerateMatchupsForWeekPatch.html">GenerateMatchupsForWeekPatch</a></li><li><a href="GenerateWeeklyResultsPatch.html">GenerateWeeklyResultsPatch</a></li><li><a href="GridActionButtonComponent.html">GridActionButtonComponent</a></li><li><a href="GridComponent.html">GridComponent</a></li><li><a href="Home.html">Home</a></li><li><a href="InjectUserTeam.html">InjectUserTeam</a></li><li><a href="LeagueComponent.html">LeagueComponent</a></li><li><a href="Lineup.html">Lineup</a></li><li><a href="LinkComponent.html">LinkComponent</a></li><li><a href="Matchup.html">Matchup</a></li><li><a href="module-routing-Router.html">Router</a></li><li><a href="MyTeamComponent.html">MyTeamComponent</a></li><li><a href="Player.html">Player</a></li><li><a href="ScoresComponent.html">ScoresComponent</a></li><li><a href="ScoresController.html">ScoresController</a></li><li><a href="SeedAPIDataPatch.html">SeedAPIDataPatch</a></li><li><a href="SeedWeeklyPlayerDataPatch.html">SeedWeeklyPlayerDataPatch</a></li><li><a href="SportsDataService.html">SportsDataService</a></li><li><a href="Team.html">Team</a></li><li><a href="Teams.html">Teams</a></li><li><a href="TopLevelComponent.html">TopLevelComponent</a></li><li><a href="User.html">User</a></li><li><a href="WeeklyPlayerStat.html">WeeklyPlayerStat</a></li><li><a href="WeeklyTeamStat.html">WeeklyTeamStat</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GridCellRenderType">GridCellRenderType</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Sun Nov 08 2020 14:34:32 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
