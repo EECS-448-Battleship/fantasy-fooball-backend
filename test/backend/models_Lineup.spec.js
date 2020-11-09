@@ -21,7 +21,11 @@ describe('the lineup model', function() {
             week_num: '6',
         })
         expect(await lineup.to_api()).to.be.eql({
-            //?
+            //not absolutely sure about this one
+            team_id: undefined,
+            active: undefined,
+            //not surea bout above, either
+            week_num: 5,
         })
     })
 })

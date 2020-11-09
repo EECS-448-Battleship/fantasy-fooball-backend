@@ -18,9 +18,21 @@ describe('the matchup model', function() {
             home_team_score: 20,
             visitor_team_score: 21,
         })
+        //I added one for every async function, hopefully that is the right call
         expect(await Matchup.to_api()).to.be.eql({
-
+            home_team: 'home team',
+            visitor_team: 'visiting team',
         })
+        //uncertain for what to even put in these below
+        expect(await Matchup.home_team()).to.be.eql({
+            home_team_id: 'test home team',        
+        })
+
+        expect(await Matchup.visitor_team()).to.be.eql({
+            visitor_team_id: 'test vistor team',
+        })
+
+        
 
     })
 })
