@@ -10,7 +10,7 @@ const { Injectable } = require('flitter-di')
  */
 class GenerateWeeklyResultsPatch extends Injectable {
     static get services() {
-        return [...super.services, 'models', 'sports_data']
+        return [...super.services, 'models', 'sports_data', 'output']
     }
 
     /**
